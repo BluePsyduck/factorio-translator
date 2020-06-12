@@ -1,0 +1,51 @@
+{
+  "name": "bluepsyduck/factorio-translator",
+  "description": "A library able to translate localised strings from Factorio, given the locale files.",
+  "homepage": "https://github.com/BluePsyduck/factorio-translator",
+  "type": "library",
+  "keywords": ["Factorio", "translator"],
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "BluePsyduck",
+      "email": "bluepsyduck@gmx.com"
+    }
+  ],
+  "require": {
+    "php": "^7.4"
+  },
+  "require-dev": {
+    "bluepsyduck/test-helper": "^1.0",
+    "phpstan/phpstan": "^0.12",
+    "phpstan/phpstan-phpunit": "^0.12",
+    "phpstan/phpstan-strict-rules": "^0.12",
+    "phpunit/phpunit": "^8.0",
+    "rregeer/phpunit-coverage-check": "^0.3",
+    "squizlabs/php_codesniffer": "^3.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "BluePsyduck\\FactorioTranslator\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BluePsyduckTest\\FactorioTranslator\\": "test/src/"
+    }
+  },
+  "scripts": {
+    "coverage-check": "coverage-check test/coverage/clover.xml 100",
+    "phpcbf": "phpcbf -p --colors",
+    "phpcs": "phpcs -p --colors",
+    "phpstan": "phpstan analyse --no-interaction --ansi",
+    "test-unit": "phpunit --testsuite unit-test --colors=always --coverage-html=test/coverage --coverage-clover=test/coverage/clover.xml",
+    "test-serialize": "phpunit --testsuite serializer-test --colors=always",
+    "test": [
+      "@test-unit",
+      "@test-serialize",
+      "@coverage-check",
+      "@phpcs",
+      "@phpstan"
+    ]
+  }
+}
