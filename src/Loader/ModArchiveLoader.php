@@ -14,8 +14,6 @@ use ZipArchive;
  */
 class ModArchiveLoader extends AbstractLoader implements LoaderInterface
 {
-    protected const REGEXP_LOCALE_FILE = '#^[^/]+/locale/([^/]+)/[^/]+\.cfg$#';
-
     public function supports(string $path): bool
     {
         $archive = new ZipArchive();
@@ -30,7 +28,7 @@ class ModArchiveLoader extends AbstractLoader implements LoaderInterface
 
         for ($i = 0; $i < $archive->numFiles; ++$i) {
             $stat = $archive->statIndex($i);
-            if (is_array($stat) && preg_match(self::REGEXP_LOCALE_FILE, $stat['name'], $match) > 0) {
+            if (is_array($stat) && preg_match('#^[^/]+/locale/([^/]+)/[^/]+\.cfg$#', $stat['name'], $match) > 0) {
                 $locale = $match[1];
                 $stream = $archive->getStream($stat['name']);
                 if (is_resource($stream)) {

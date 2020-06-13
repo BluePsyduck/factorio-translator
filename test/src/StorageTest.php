@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace BluePsyduckTest\FactorioTranslator;
 
-use BluePsyduck\FactorioTranslator\LocaleStorage;
+use BluePsyduck\FactorioTranslator\Storage;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The PHPUnit test of the LocaleStorage class.
+ * The PHPUnit test of the Storage class.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\LocaleStorage
+ * @coversDefaultClass \BluePsyduck\FactorioTranslator\Storage
  */
-class LocaleStorageTest extends TestCase
+class StorageTest extends TestCase
 {
     /**
-     * Tests the  method.
      * @covers ::get
      * @covers ::set
      */
     public function testSetAndGet(): void
     {
-        $storage = new LocaleStorage();
+        $storage = new Storage();
 
         $this->assertSame('', $storage->get('abc', 'def', 'ghi'));
 

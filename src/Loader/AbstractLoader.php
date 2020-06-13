@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace BluePsyduck\FactorioTranslator\Loader;
 
-use BluePsyduck\FactorioTranslator\LocaleStorage;
+use BluePsyduck\FactorioTranslator\StorageAwareInterface;
+use BluePsyduck\FactorioTranslator\StorageAwareTrait;
 
 /**
  * The abstract class of the loaders, able to actually parse a locale file.
@@ -12,14 +13,9 @@ use BluePsyduck\FactorioTranslator\LocaleStorage;
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-abstract class AbstractLoader
+abstract class AbstractLoader implements StorageAwareInterface
 {
-    protected LocaleStorage $storage;
-
-    public function __construct(LocaleStorage $storage)
-    {
-        $this->storage = $storage;
-    }
+    use StorageAwareTrait;
 
     protected function parseContents(string $locale, string $contents): void
     {

@@ -12,8 +12,6 @@ namespace BluePsyduck\FactorioTranslator\Loader;
  */
 class ModDirectoryLoader extends AbstractLoader implements LoaderInterface
 {
-    protected const GLOB_PATTERN = 'locale/*/*.cfg';
-
     public function supports(string $path): bool
     {
         return is_dir($path);
@@ -35,7 +33,7 @@ class ModDirectoryLoader extends AbstractLoader implements LoaderInterface
      */
     protected function findFiles(string $path): array
     {
-        $result = glob($path . '/' . self::GLOB_PATTERN);
+        $result = glob("${path}/locale/*/*.cfg");
         return ($result === false) ? [] : $result;
     }
 }

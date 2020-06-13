@@ -12,7 +12,8 @@
     }
   ],
   "require": {
-    "php": "^7.4"
+    "php": "^7.4",
+    "ext-zip": "*"
   },
   "require-dev": {
     "bluepsyduck/test-helper": "^1.0",
