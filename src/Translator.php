@@ -9,7 +9,7 @@ use BluePsyduck\FactorioTranslator\Loader\LoaderInterface;
 use BluePsyduck\FactorioTranslator\Placeholder\PlaceholderHandlerInterface;
 
 /**
- * THe main translator class.
+ * The main translator class.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
@@ -127,7 +127,7 @@ class Translator
      * @param array<mixed> $parameters
      * @return string
      */
-    protected function replacePlaceholders(string $locale, string $string, array $parameters): string
+    public function replacePlaceholders(string $locale, string $string, array $parameters): string
     {
         foreach ($this->placeholderHandlers as $handler) {
             $string = $handler->handle($locale, $string, $parameters);
