@@ -24,13 +24,13 @@ class PositionPlaceholderHandler extends AbstractRegexPlaceholder implements Tra
 
     /**
      * @param string $locale
-     * @param string $value
+     * @param array<string>|string[] $values
      * @param array<mixed> $parameters
      * @return string|null
      */
-    protected function process(string $locale, string $value, array $parameters): ?string
+    protected function process(string $locale, array $values, array $parameters): ?string
     {
-        $position = (int) $value;
+        $position = (int) $values[0];
         if (!isset($parameters[$position - 1])) {
             return null;
         }

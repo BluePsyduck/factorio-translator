@@ -28,8 +28,8 @@ abstract class AbstractRegexPlaceholder implements PlaceholderHandlerInterface
     public function handle(string $locale, string $string, array $parameters): string
     {
         $placeholders = $this->findPlaceholders($string);
-        foreach ($placeholders as $placeholder => $value) {
-            $replacement = $this->process($locale, $value, $parameters);
+        foreach ($placeholders as $placeholder => $values) {
+            $replacement = $this->process($locale, $values, $parameters);
             if ($replacement !== null) {
                 $string = str_replace($placeholder, $replacement, $string);
             }
@@ -39,14 +39,15 @@ abstract class AbstractRegexPlaceholder implements PlaceholderHandlerInterface
 
     /**
      * @param string $string
-     * @return array<string,string>|string[]
+     * @return array<string,array<string>>|string[][]
      */
     protected function findPlaceholders(string $string): array
     {
         $placeholders = [];
-        if (preg_match_all($this->pattern, $string, $matches) > 0) {
-            foreach ($matches[0] as $i => $placeholder) {
-                $placeholders[$placeholder] = $matches[1][$i];
+        if (preg_match_all($this->pattern, $string, $matches, PREG_SET_ORDER) > 0) {
+            foreach ($matches as $match) {
+                $placeholder = array_shift($match);
+                $placeholders[$placeholder] = $match;
             }
         }
         return $placeholders;
@@ -54,9 +55,9 @@ abstract class AbstractRegexPlaceholder implements PlaceholderHandlerInterface
 
     /**
      * @param string $locale
-     * @param string $value
+     * @param array<string>|string[] $values
      * @param array<mixed> $parameters
      * @return string|null
      */
-    abstract protected function process(string $locale, string $value, array $parameters): ?string;
+    abstract protected function process(string $locale, array $values, array $parameters): ?string;
 }

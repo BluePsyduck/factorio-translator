@@ -117,7 +117,7 @@ class Translator
     {
         [$section, $name] = explode('.', $key);
         $result = $this->storage->get($locale, $section, $name);
-        $this->replacePlaceholders($locale, $result, $parameters);
+        $result = $this->replacePlaceholders($locale, $result, $parameters);
         return $result;
     }
 
