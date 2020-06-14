@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace BluePsyduck\FactorioTranslator\Placeholder;
+namespace BluePsyduck\FactorioTranslator\Processor\Placeholder;
+
+use BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor;
 
 /**
- * The abstract class handling the control placeholders like __CONTROL__build__ and __ALT_CONTROL__1__build__.
+ * The abstract class processing the control placeholders like __CONTROL__build__ and __ALT_CONTROL__1__build__.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-abstract class AbstractControlPlaceholderHandler extends AbstractRegexPlaceholder
+abstract class AbstractControlPlaceholderProcessor extends AbstractRegexProcessor
 {
     public function __construct()
     {
@@ -23,7 +25,7 @@ abstract class AbstractControlPlaceholderHandler extends AbstractRegexPlaceholde
      * @param array<mixed> $parameters
      * @return string|null
      */
-    protected function process(string $locale, array $values, array $parameters): ?string
+    protected function processMatch(string $locale, array $values, array $parameters): ?string
     {
         return $this->processControl($locale, $values[2], (int) $values[1]);
     }

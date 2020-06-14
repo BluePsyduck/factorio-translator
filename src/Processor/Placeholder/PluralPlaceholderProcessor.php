@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace BluePsyduck\FactorioTranslator\Placeholder;
+namespace BluePsyduck\FactorioTranslator\Processor\Placeholder;
 
+use BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor;
 use BluePsyduck\FactorioTranslator\TranslatorAwareInterface;
 use BluePsyduck\FactorioTranslator\TranslatorAwareTrait;
 
 /**
- * The class handling the plural form placeholders.
+ * The class processing the plural form placeholders.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-class PluralPlaceholderHandler extends AbstractRegexPlaceholder implements TranslatorAwareInterface
+class PluralPlaceholderProcessor extends AbstractRegexProcessor implements TranslatorAwareInterface
 {
     use TranslatorAwareTrait;
 
@@ -28,7 +29,7 @@ class PluralPlaceholderHandler extends AbstractRegexPlaceholder implements Trans
      * @param array<mixed> $parameters
      * @return string|null
      */
-    protected function process(string $locale, array $values, array $parameters): ?string
+    protected function processMatch(string $locale, array $values, array $parameters): ?string
     {
         $position = (int) $values[0];
         if (!isset($parameters[$position - 1])) {
@@ -49,7 +50,7 @@ class PluralPlaceholderHandler extends AbstractRegexPlaceholder implements Trans
             [$cases, $string] = explode('=', $condition, 2);
             foreach (explode(',', $cases) as $case) {
                 if ($this->evaluateCondition($case, $number)) {
-                    return $this->translator->replacePlaceholders($locale, $string, []);
+                    return $this->translator->applyProcessors($locale, $string, []);
                 }
             }
         }

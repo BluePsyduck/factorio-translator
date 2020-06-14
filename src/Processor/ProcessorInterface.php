@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace BluePsyduck\FactorioTranslator\Placeholder;
+namespace BluePsyduck\FactorioTranslator\Processor;
 
 /**
- * The interface of the placeholder handlers.
+ * The interface of the text processors.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-interface PlaceholderHandlerInterface
+interface ProcessorInterface
 {
     /**
      * @param string $locale
@@ -18,5 +18,5 @@ interface PlaceholderHandlerInterface
      * @param array<mixed> $parameters
      * @return string
      */
-    public function handle(string $locale, string $string, array $parameters): string;
+    public function process(string $locale, string $string, array $parameters): string;
 }

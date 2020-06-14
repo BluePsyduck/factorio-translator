@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace BluePsyduck\FactorioTranslator\Placeholder;
+namespace BluePsyduck\FactorioTranslator\Processor\Placeholder;
 
+use BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor;
 use BluePsyduck\FactorioTranslator\TranslatorAwareInterface;
 use BluePsyduck\FactorioTranslator\TranslatorAwareTrait;
 
 /**
- * The class handling item placeholders like __ITEM__electronic-circuit__.
+ * The class processing item placeholders like __ITEM__electronic-circuit__.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-class ItemPlaceholderHandler extends AbstractRegexPlaceholder implements TranslatorAwareInterface
+class ItemPlaceholderProcessor extends AbstractRegexProcessor implements TranslatorAwareInterface
 {
     use TranslatorAwareTrait;
 
@@ -28,7 +29,7 @@ class ItemPlaceholderHandler extends AbstractRegexPlaceholder implements Transla
      * @param array<mixed> $parameters
      * @return string|null
      */
-    protected function process(string $locale, array $values, array $parameters): ?string
+    protected function processMatch(string $locale, array $values, array $parameters): ?string
     {
         return $this->translator->translateWithFallback($locale, ["item-name.{$values[0]}"]);
     }

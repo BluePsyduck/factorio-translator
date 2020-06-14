@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace BluePsyduck\FactorioTranslator\Placeholder;
+namespace BluePsyduck\FactorioTranslator\Processor\Placeholder;
 
+use BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor;
 use BluePsyduck\FactorioTranslator\TranslatorAwareInterface;
 use BluePsyduck\FactorioTranslator\TranslatorAwareTrait;
 
 /**
- * The class handling the positional placeholders like __1__.
+ * The class processing the positional placeholders like __1__.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-class PositionPlaceholderHandler extends AbstractRegexPlaceholder implements TranslatorAwareInterface
+class PositionPlaceholderProcessor extends AbstractRegexProcessor implements TranslatorAwareInterface
 {
     use TranslatorAwareTrait;
 
@@ -28,7 +29,7 @@ class PositionPlaceholderHandler extends AbstractRegexPlaceholder implements Tra
      * @param array<mixed> $parameters
      * @return string|null
      */
-    protected function process(string $locale, array $values, array $parameters): ?string
+    protected function processMatch(string $locale, array $values, array $parameters): ?string
     {
         $position = (int) $values[0];
         if (!isset($parameters[$position - 1])) {

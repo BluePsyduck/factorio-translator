@@ -6,7 +6,7 @@ namespace BluePsyduck\FactorioTranslator;
 
 use BluePsyduck\FactorioTranslator\Exception\NoSupportedLoaderException;
 use BluePsyduck\FactorioTranslator\Loader\LoaderInterface;
-use BluePsyduck\FactorioTranslator\Placeholder\PlaceholderHandlerInterface;
+use BluePsyduck\FactorioTranslator\Processor\ProcessorInterface;
 
 /**
  * The main translator class.
@@ -24,9 +24,9 @@ class Translator
     protected array $loaders;
 
     /**
-     * @var array<PlaceholderHandlerInterface>|PlaceholderHandlerInterface[]
+     * @var array<ProcessorInterface>|ProcessorInterface[]
      */
-    protected array $placeholderHandlers = [];
+    protected array $processors = [];
 
     /**
      * @param Storage $storage
@@ -52,10 +52,10 @@ class Translator
         }
     }
 
-    public function addPlaceholderHandler(PlaceholderHandlerInterface $handler): self
+    public function addProcessor(ProcessorInterface $processor): self
     {
-        $this->initialize($handler);
-        $this->placeholderHandlers[] = $handler;
+        $this->initialize($processor);
+        $this->processors[] = $processor;
         return $this;
     }
 
@@ -140,7 +140,7 @@ class Translator
 
         [$section, $name] = explode('.', $key);
         $result = $this->storage->get($locale, $section, $name);
-        $result = $this->replacePlaceholders($locale, $result, $parameters);
+        $result = $this->applyProcessors($locale, $result, $parameters);
         return $result;
     }
 
@@ -150,10 +150,10 @@ class Translator
      * @param array<mixed> $parameters
      * @return string
      */
-    public function replacePlaceholders(string $locale, string $string, array $parameters): string
+    public function applyProcessors(string $locale, string $string, array $parameters): string
     {
-        foreach ($this->placeholderHandlers as $handler) {
-            $string = $handler->handle($locale, $string, $parameters);
+        foreach ($this->processors as $handler) {
+            $string = $handler->process($locale, $string, $parameters);
         }
         return $string;
     }

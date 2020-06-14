@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace BluePsyduck\FactorioTranslator\Placeholder;
+namespace BluePsyduck\FactorioTranslator\Processor;
 
 /**
- * The abstract class for placeholders using a regular expression to match.
+ * The abstract class for processors using a regular expression to find matches.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-abstract class AbstractRegexPlaceholder implements PlaceholderHandlerInterface
+abstract class AbstractRegexProcessor implements ProcessorInterface
 {
     protected string $pattern;
 
@@ -25,11 +25,11 @@ abstract class AbstractRegexPlaceholder implements PlaceholderHandlerInterface
      * @param array<mixed> $parameters
      * @return string
      */
-    public function handle(string $locale, string $string, array $parameters): string
+    public function process(string $locale, string $string, array $parameters): string
     {
         $placeholders = $this->findPlaceholders($string);
         foreach ($placeholders as $placeholder => $values) {
-            $replacement = $this->process($locale, $values, $parameters);
+            $replacement = $this->processMatch($locale, $values, $parameters);
             if ($replacement !== null) {
                 $string = str_replace($placeholder, $replacement, $string);
             }
@@ -59,5 +59,5 @@ abstract class AbstractRegexPlaceholder implements PlaceholderHandlerInterface
      * @param array<mixed> $parameters
      * @return string|null
      */
-    abstract protected function process(string $locale, array $values, array $parameters): ?string;
+    abstract protected function processMatch(string $locale, array $values, array $parameters): ?string;
 }
