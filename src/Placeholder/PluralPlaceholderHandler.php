@@ -42,6 +42,10 @@ class PluralPlaceholderHandler extends AbstractRegexPlaceholder implements Trans
     protected function processConditions(string $locale, string $conditions, int $number): ?string
     {
         foreach (explode('|', $conditions) as $condition) {
+            if (strpos($condition, '=') === false) {
+                continue;
+            }
+
             [$cases, $string] = explode('=', $condition, 2);
             foreach (explode(',', $cases) as $case) {
                 if ($this->evaluateCondition($case, $number)) {

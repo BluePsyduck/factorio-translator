@@ -35,6 +35,6 @@ class PositionPlaceholderHandler extends AbstractRegexPlaceholder implements Tra
             return null;
         }
 
-        return $this->translator->translate($locale, $parameters[$position - 1]);
+        return $this->translator->translateWithFallback($locale, $parameters[$position - 1]);
     }
 }

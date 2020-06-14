@@ -52,22 +52,24 @@ class Translator
         }
     }
 
-    public function addPlaceholderHandler(PlaceholderHandlerInterface $handler): void
+    public function addPlaceholderHandler(PlaceholderHandlerInterface $handler): self
     {
         $this->initialize($handler);
         $this->placeholderHandlers[] = $handler;
+        return $this;
     }
 
     /**
      * @param string $path
+     * @return $this
      * @throws NoSupportedLoaderException
      */
-    public function loadMod(string $path): void
+    public function loadMod(string $path): self
     {
         foreach ($this->loaders as $loader) {
             if ($loader->supports($path)) {
                 $loader->load($path);
-                return;
+                return $this;
             }
         }
 
@@ -75,6 +77,7 @@ class Translator
     }
 
     /**
+     * Translates the localised string into the specified locale.
      * @param string $locale
      * @param mixed $localisedString
      * @return string
@@ -94,6 +97,22 @@ class Translator
     }
 
     /**
+     * Translates the localised string into the specified locale, or falls back to English if the locale does not
+     * have a translation.
+     * @param string $locale
+     * @param mixed $localisedString
+     * @return string
+     */
+    public function translateWithFallback(string $locale, $localisedString): string
+    {
+        $result = $this->translate($locale, $localisedString);
+        if ($result === '' && $locale !== 'en') {
+            $result = $this->translate('en', $localisedString);
+        }
+        return $result;
+    }
+
+    /**
      * @param string $locale
      * @param array<mixed> $parts
      * @return string
@@ -102,7 +121,7 @@ class Translator
     {
         $values = [];
         foreach ($parts as $part) {
-            $values[] = $this->translate($locale, $part);
+            $values[] = $this->translateWithFallback($locale, $part);
         }
         return implode($values);
     }
@@ -115,6 +134,10 @@ class Translator
      */
     protected function doTranslate(string $locale, string $key, array $parameters): string
     {
+        if (strpos($key, '.') === false) {
+            return '';
+        }
+
         [$section, $name] = explode('.', $key);
         $result = $this->storage->get($locale, $section, $name);
         $result = $this->replacePlaceholders($locale, $result, $parameters);

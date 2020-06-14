@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BluePsyduck\FactorioTranslator\Placeholder;
 
-use BluePsyduck\FactorioTranslator\StorageAwareInterface;
-use BluePsyduck\FactorioTranslator\StorageAwareTrait;
+use BluePsyduck\FactorioTranslator\TranslatorAwareInterface;
+use BluePsyduck\FactorioTranslator\TranslatorAwareTrait;
 
 /**
  * The class handling item placeholders like __ITEM__electronic-circuit__.
@@ -13,9 +13,9 @@ use BluePsyduck\FactorioTranslator\StorageAwareTrait;
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
  */
-class ItemPlaceholderHandler extends AbstractRegexPlaceholder implements StorageAwareInterface
+class ItemPlaceholderHandler extends AbstractRegexPlaceholder implements TranslatorAwareInterface
 {
-    use StorageAwareTrait;
+    use TranslatorAwareTrait;
 
     public function __construct()
     {
@@ -30,6 +30,6 @@ class ItemPlaceholderHandler extends AbstractRegexPlaceholder implements Storage
      */
     protected function process(string $locale, array $values, array $parameters): ?string
     {
-        return $this->storage->get($locale, 'item-name', $values[0]);
+        return $this->translator->translateWithFallback($locale, ["item-name.{$values[0]}"]);
     }
 }
