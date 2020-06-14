@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BluePsyduck\FactorioTranslator\Placeholder;
 
 /**
- *
+ * The abstract class for placeholders using a regular expression to match.
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
