@@ -16,7 +16,7 @@ abstract class AbstractControlPlaceholderProcessor extends AbstractRegexProcesso
 {
     public function __construct()
     {
-        parent::__construct('#__(CONTROL|ALT_CONTROL__(\d+))__(.*)__#U');
+        parent::__construct('#__(CONTROL|ALT_CONTROL__(\d+))__(.+)__#U');
     }
 
     /**
@@ -30,5 +30,13 @@ abstract class AbstractControlPlaceholderProcessor extends AbstractRegexProcesso
         return $this->processControl($locale, $values[2], (int) $values[1]);
     }
 
+    /**
+     * Processes the control placeholder.
+     * @param string $locale The locale the translator is currently running on, e.g. "en".
+     * @param string $controlName The name of the control, e.g. "build".
+     * @param int $version The alternative version of the placeholder in case of __ALT_CONTROL__ syntax. 0 if the
+     * placeholder was the default __CONTROL__ one.
+     * @return string|null The replacement for the placeholder, or null to keep the placeholder as-is.
+     */
     abstract protected function processControl(string $locale, string $controlName, int $version): ?string;
 }

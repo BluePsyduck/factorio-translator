@@ -20,7 +20,7 @@ class PluralPlaceholderProcessor extends AbstractRegexProcessor implements Trans
 
     public function __construct()
     {
-        parent::__construct('#__plural_for_parameter_(\d+)_\{(.*)\}__#U');
+        parent::__construct('#__plural_for_parameter_(\d+)_\{(.+)\}__#U');
     }
 
     /**

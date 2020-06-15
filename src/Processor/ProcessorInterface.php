@@ -13,10 +13,11 @@ namespace BluePsyduck\FactorioTranslator\Processor;
 interface ProcessorInterface
 {
     /**
-     * @param string $locale
-     * @param string $string
-     * @param array<mixed> $parameters
-     * @return string
+     * Processes the passed string.
+     * @param string $locale The locale the translator is currently running on, e.g. "en".
+     * @param string $string The string to process.
+     * @param array<mixed> $parameters The additional parameters of the localised string.
+     * @return string The processed string.
      */
     public function process(string $locale, string $string, array $parameters): string;
 }

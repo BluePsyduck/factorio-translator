@@ -54,10 +54,11 @@ abstract class AbstractRegexProcessor implements ProcessorInterface
     }
 
     /**
-     * @param string $locale
-     * @param array<string>|string[] $values
-     * @param array<mixed> $parameters
-     * @return string|null
+     * Processes the match of the regular expression.
+     * @param string $locale The locale the translator is currently running on, e.g. "en".
+     * @param array<string>|string[] $values The values matched by the regular expression as 0-indexed array.
+     * @param array<mixed> $parameters The additional parameters of the localised string.
+     * @return string|null The replacement for the match, or null to keep the match as-is.
      */
     abstract protected function processMatch(string $locale, array $values, array $parameters): ?string;
 }
