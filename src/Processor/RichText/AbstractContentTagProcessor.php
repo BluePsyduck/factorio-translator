@@ -24,11 +24,11 @@ abstract class AbstractContentTagProcessor implements ProcessorInterface
      */
     public function process(string $locale, string $string, array $parameters): string
     {
-        if (preg_match_all(self::PATTERN, $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE) > 0) {
-            $position = 0;
-            $contents = [''];
-            $openedTags = [];
+        $position = 0;
+        $contents = [''];
+        $openedTags = [];
 
+        if (preg_match_all(self::PATTERN, $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE) > 0) {
             foreach ($matches as $match) {
                 $contents[0] .= substr($string, $position, $match[0][1] - $position);
                 $position = $match[0][1] + strlen($match[0][0]);
@@ -67,11 +67,9 @@ abstract class AbstractContentTagProcessor implements ProcessorInterface
 
             // Copy the end of the string after the last tag.
             $contents[0] .= substr($string, $position);
-
-            return $contents[0];
         }
 
-        return $string;
+        return $contents[0];
     }
 
     /**

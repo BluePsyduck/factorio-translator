@@ -42,7 +42,7 @@ class AbstractControlPlaceholderProcessorTest extends TestCase
         $locale = 'abc';
         $values = ['CONTROL', '42', 'def'];
         $parameters = ['ghi'];
-        $translatedValue = 'jkl';
+        $processedValue = 'jkl';
 
         /* @var AbstractControlPlaceholderProcessor&MockObject $processor */
         $processor = $this->getMockBuilder(AbstractControlPlaceholderProcessor::class)
@@ -51,10 +51,10 @@ class AbstractControlPlaceholderProcessorTest extends TestCase
         $processor->expects($this->once())
                   ->method('processControl')
                   ->with($this->identicalTo($locale), $this->identicalTo('def'), $this->identicalTo(42))
-                  ->willReturn($translatedValue);
+                  ->willReturn($processedValue);
 
         $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
 
-        $this->assertSame($translatedValue, $result);
+        $this->assertSame($processedValue, $result);
     }
 }

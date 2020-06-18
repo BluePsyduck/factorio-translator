@@ -14,14 +14,28 @@ use BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor;
  */
 abstract class AbstractStandaloneTagProcessor extends AbstractRegexProcessor
 {
-    protected const BLACKLISTED_NAMES = [
-        'color',
-        'font',
+    protected const PATTERN = '#\[(.+)=(.+)\]#U';
+    protected const TAG_NAMES = [
+        'img',
+        'item',
+        'entity',
+        'technology',
+        'recipe',
+        'item-group',
+        'fluid',
+        'tile',
+        'virtual-signal',
+        'achievement',
+        'gps',
+        'special-item',
+        'armor',
+        'train',
+        'train-stop',
     ];
 
     public function __construct()
     {
-        parent::__construct('#\[(.+)=(.+)\]#U');
+        parent::__construct(self::PATTERN);
     }
 
     /**
@@ -33,7 +47,7 @@ abstract class AbstractStandaloneTagProcessor extends AbstractRegexProcessor
     protected function processMatch(string $locale, array $values, array $parameters): ?string
     {
         [$name, $value] = $values;
-        if (in_array($name, self::BLACKLISTED_NAMES, true)) {
+        if (!in_array($name, self::TAG_NAMES, true)) {
             return null;
         }
 
