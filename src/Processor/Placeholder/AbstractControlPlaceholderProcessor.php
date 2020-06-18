@@ -14,9 +14,11 @@ use BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor;
  */
 abstract class AbstractControlPlaceholderProcessor extends AbstractRegexProcessor
 {
+    protected const PATTERN = '#__(CONTROL|ALT_CONTROL__(\d+))__(.+)__#U';
+
     public function __construct()
     {
-        parent::__construct('#__(CONTROL|ALT_CONTROL__(\d+))__(.+)__#U');
+        parent::__construct(self::PATTERN);
     }
 
     /**

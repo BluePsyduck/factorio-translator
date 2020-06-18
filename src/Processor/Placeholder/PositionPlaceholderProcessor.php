@@ -18,9 +18,11 @@ class PositionPlaceholderProcessor extends AbstractRegexProcessor implements Tra
 {
     use TranslatorAwareTrait;
 
+    protected const PATTERN = '#__(\d+)__#U';
+
     public function __construct()
     {
-        parent::__construct('#__(\d+)__#');
+        parent::__construct(self::PATTERN);
     }
 
     /**

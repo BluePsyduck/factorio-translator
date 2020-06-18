@@ -18,9 +18,11 @@ class PluralPlaceholderProcessor extends AbstractRegexProcessor implements Trans
 {
     use TranslatorAwareTrait;
 
+    protected const PATTERN = '#__plural_for_parameter_(\d+)_\{(.+)\}__#U';
+
     public function __construct()
     {
-        parent::__construct('#__plural_for_parameter_(\d+)_\{(.+)\}__#U');
+        parent::__construct(self::PATTERN);
     }
 
     /**

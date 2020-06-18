@@ -18,9 +18,11 @@ class ItemPlaceholderProcessor extends AbstractRegexProcessor implements Transla
 {
     use TranslatorAwareTrait;
 
+    protected const PATTERN = '#__ITEM__(.+)__#U';
+
     public function __construct()
     {
-        parent::__construct('#__ITEM__(.+)__#U');
+        parent::__construct(self::PATTERN);
     }
 
     /**
