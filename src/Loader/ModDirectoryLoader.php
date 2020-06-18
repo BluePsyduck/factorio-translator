@@ -19,21 +19,17 @@ class ModDirectoryLoader extends AbstractLoader implements LoaderInterface
 
     public function load(string $path): void
     {
-        $files = $this->findFiles($path);
+        $files = glob("${path}/locale/*/*.cfg");
+        // @codeCoverageIgnoreStart
+        if ($files === false) {
+            return;
+        }
+        // @codeCoverageIgnoreEnd
+
         foreach ($files as $file) {
             $parts = explode('/', $file);
             $locale = $parts[count($parts) - 2];
             $this->parseContents($locale, (string) file_get_contents($file));
         }
-    }
-
-    /**
-     * @param string $path
-     * @return array<string>|string[]
-     */
-    protected function findFiles(string $path): array
-    {
-        $result = glob("${path}/locale/*/*.cfg");
-        return ($result === false) ? [] : $result;
     }
 }
