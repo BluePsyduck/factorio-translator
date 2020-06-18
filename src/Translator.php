@@ -16,6 +16,8 @@ use BluePsyduck\FactorioTranslator\Processor\ProcessorInterface;
  */
 class Translator
 {
+    protected const FALLBACK_LOCALE = 'en';
+
     protected Storage $storage;
 
     /**
@@ -28,18 +30,33 @@ class Translator
      */
     protected array $processors = [];
 
-    /**
-     * @param Storage $storage
-     * @param array<LoaderInterface>|LoaderInterface[] $loaders
-     */
-    public function __construct(Storage $storage, array $loaders)
+    public function __construct(Storage $storage)
     {
         $this->storage = $storage;
-        $this->loaders = $loaders;
+    }
 
-        foreach ($this->loaders as $loader) {
-            $this->initialize($loader);
-        }
+    /**
+     * Adds a mod loader to the translator, to load the locale files of mods.
+     * @param LoaderInterface $loader
+     * @return $this
+     */
+    public function addLoader(LoaderInterface $loader): self
+    {
+        $this->initialize($loader);
+        $this->loaders[] = $loader;
+        return $this;
+    }
+
+    /**
+     * Adds a text processor to the translator, which will be called after a string has been translated.
+     * @param ProcessorInterface $processor
+     * @return $this
+     */
+    public function addProcessor(ProcessorInterface $processor): self
+    {
+        $this->initialize($processor);
+        $this->processors[] = $processor;
+        return $this;
     }
 
     protected function initialize(object $instance): void
@@ -50,13 +67,6 @@ class Translator
         if ($instance instanceof TranslatorAwareInterface) {
             $instance->setTranslator($this);
         }
-    }
-
-    public function addProcessor(ProcessorInterface $processor): self
-    {
-        $this->initialize($processor);
-        $this->processors[] = $processor;
-        return $this;
     }
 
     /**
@@ -78,9 +88,9 @@ class Translator
 
     /**
      * Translates the localised string into the specified locale.
-     * @param string $locale
-     * @param mixed $localisedString
-     * @return string
+     * @param string $locale The locale to use for the translation.
+     * @param mixed $localisedString The localised string to translate.
+     * @return string The translated string, or an empty string if no translation is available.
      */
     public function translate(string $locale, $localisedString): string
     {
@@ -99,15 +109,15 @@ class Translator
     /**
      * Translates the localised string into the specified locale, or falls back to English if the locale does not
      * have a translation.
-     * @param string $locale
-     * @param mixed $localisedString
-     * @return string
+     * @param string $locale The locale to use for the translation.
+     * @param mixed $localisedString The localised string to translate.
+     * @return string The translated string, or an empty string if no translation is available.
      */
     public function translateWithFallback(string $locale, $localisedString): string
     {
         $result = $this->translate($locale, $localisedString);
-        if ($result === '' && $locale !== 'en') {
-            $result = $this->translate('en', $localisedString);
+        if ($result === '' && $locale !== self::FALLBACK_LOCALE) {
+            $result = $this->translate(self::FALLBACK_LOCALE, $localisedString);
         }
         return $result;
     }
@@ -139,16 +149,21 @@ class Translator
         }
 
         [$section, $name] = explode('.', $key);
+        if (!$this->storage->has($locale, $section, $name)) {
+            return '';
+        }
+
         $result = $this->storage->get($locale, $section, $name);
         $result = $this->applyProcessors($locale, $result, $parameters);
         return $result;
     }
 
     /**
-     * @param string $locale
-     * @param string $string
-     * @param array<mixed> $parameters
-     * @return string
+     * Applies all processors added to the translator to the string.
+     * @param string $locale The locale to use. This locale will be passed to the processors for further translations.
+     * @param string $string The string to process.
+     * @param array<mixed> $parameters The additional parameters from the original localised string.
+     * @return string The processed string.
      */
     public function applyProcessors(string $locale, string $string, array $parameters): string
     {

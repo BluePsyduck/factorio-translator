@@ -26,4 +26,9 @@ class Storage
     {
         return $this->values[$locale][$section][$name] ?? '';
     }
+
+    public function has(string $locale, string $section, string $name): bool
+    {
+        return isset($this->values[$locale][$section][$name]);
+    }
 }

@@ -35,14 +35,14 @@ abstract class AbstractContentTagProcessor implements ProcessorInterface
 
                 if (isset($match[5])) {
                     // Closing tag
-                    if ($match[5][0] !== $openedTags[0][0]) {
+                    if (count($openedTags) === 0 || $match[5][0] !== $openedTags[0][0]) {
                         // Tag mismatch, ignore closing tag, copy as-is.
                         $contents[0] .= substr($string, $match[0][1], strlen($match[0][0]));
                         continue;
                     }
 
                     [$name, $value] = array_shift($openedTags);
-                    $content = array_shift($contents);
+                    $content = (string) array_shift($contents);
                     $replacement = $this->processTag($locale, $name, $value, $content);
                     if ($replacement === null) {
                         $contents[0] .= "[{$name}={$value}]{$content}[{$match[4][0]}{$name}]";

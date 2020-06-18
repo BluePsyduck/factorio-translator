@@ -18,15 +18,18 @@ class StorageTest extends TestCase
 {
     /**
      * @covers ::get
+     * @covers ::has
      * @covers ::set
      */
-    public function testSetAndGet(): void
+    public function testSetGetAndHas(): void
     {
         $storage = new Storage();
 
+        $this->assertFalse($storage->has('abc', 'def', 'ghi'));
         $this->assertSame('', $storage->get('abc', 'def', 'ghi'));
 
         $storage->set('abc', 'def', 'ghi', 'jkl');
+        $this->assertTrue($storage->has('abc', 'def', 'ghi'));
         $this->assertSame('jkl', $storage->get('abc', 'def', 'ghi'));
 
         $storage->set('abc', 'mno', 'ghi', 'pqr');
