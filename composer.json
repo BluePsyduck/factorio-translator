@@ -42,6 +42,7 @@
     "test-unit": "phpunit --testsuite unit-test --colors=always --coverage-html=test/coverage --coverage-clover=test/coverage/clover.xml",
     "test": [
       "@test-unit",
+      "@coverage-check",
       "@phpcs",
       "@phpstan"
     ]

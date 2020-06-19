@@ -31,4 +31,12 @@ class Storage
     {
         return isset($this->values[$locale][$section][$name]);
     }
+
+    /**
+     * @return array<string>|string[]
+     */
+    public function getLocales(): array
+    {
+        return array_keys($this->values);
+    }
 }

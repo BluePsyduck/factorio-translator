@@ -419,7 +419,6 @@ class TranslatorTest extends TestCase
     }
 
     /**
-     * Tests the doTranslate method.
      * @throws ReflectionException
      * @covers ::doTranslate
      */
@@ -480,5 +479,22 @@ class TranslatorTest extends TestCase
         $result = $translator->applyProcessors($locale, $string1, $parameters);
 
         $this->assertSame($string3, $result);
+    }
+
+    /**
+     * @covers ::getAllLocales
+     */
+    public function testGetAllLocales(): void
+    {
+        $locales = ['abc', 'def'];
+
+        $this->storage->expects($this->once())
+                      ->method('getLocales')
+                      ->willReturn($locales);
+
+        $translator = new Translator($this->storage);
+        $result = $translator->getAllLocales();
+
+        $this->assertSame($locales, $result);
     }
 }

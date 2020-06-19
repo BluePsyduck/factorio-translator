@@ -172,4 +172,13 @@ class Translator
         }
         return $string;
     }
+
+    /**
+     * Returns all locales currently available to any of the translations.
+     * @return array<string>|string[]
+     */
+    public function getAllLocales(): array
+    {
+        return $this->storage->getLocales();
+    }
 }

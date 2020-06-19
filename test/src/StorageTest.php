@@ -39,4 +39,19 @@ class StorageTest extends TestCase
         $storage->set('abc', 'def', 'ghi', 'stu');
         $this->assertSame('stu', $storage->get('abc', 'def', 'ghi'));
     }
+
+    /**
+     * @covers ::getLocales
+     */
+    public function testGetLocales(): void
+    {
+        $storage = new Storage();
+
+        $storage->set('foo', 'abc', 'def', 'ghi');
+        $storage->set('foo', 'jkl', 'mno', 'pqr');
+        $storage->set('bar', 'stu', 'vwx', 'yza');
+
+        $result = $storage->getLocales();
+        $this->assertSame(['foo', 'bar'], $result);
+    }
 }
