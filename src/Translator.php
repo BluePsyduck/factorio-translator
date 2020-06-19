@@ -145,10 +145,11 @@ class Translator
     protected function doTranslate(string $locale, string $key, array $parameters): string
     {
         if (strpos($key, '.') === false) {
-            return '';
+            [$section, $name] = ['', $key];
+        } else {
+            [$section, $name] = explode('.', $key);
         }
 
-        [$section, $name] = explode('.', $key);
         if (!$this->storage->has($locale, $section, $name)) {
             return '';
         }

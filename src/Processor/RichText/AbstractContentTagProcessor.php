@@ -64,10 +64,10 @@ abstract class AbstractContentTagProcessor implements ProcessorInterface
                 $content = array_shift($contents);
                 $contents[0] .= "[{$name}={$value}]{$content}";
             }
-
-            // Copy the end of the string after the last tag.
-            $contents[0] .= substr($string, $position);
         }
+
+        // Copy the end of the string after the last tag.
+        $contents[0] .= substr($string, $position);
 
         return $contents[0];
     }

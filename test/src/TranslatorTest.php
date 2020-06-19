@@ -395,27 +395,41 @@ class TranslatorTest extends TestCase
      * @throws ReflectionException
      * @covers ::doTranslate
      */
-    public function testDoTranslateWithInvalidKey(): void
+    public function testDoTranslateWithMissingSection(): void
     {
         $locale = 'abc';
-        $key = 'def';
+        $key = 'ghi';
+        $section = '';
+        $name = 'ghi';
         $parameters = ['jkl', 'mno'];
+        $storageValue = 'pqr';
+        $processedValue = 'stu';
 
-        $this->storage->expects($this->never())
-                      ->method('has');
-        $this->storage->expects($this->never())
-                      ->method('get');
+        $this->storage->expects($this->once())
+                      ->method('has')
+                      ->with($this->identicalTo($locale), $this->identicalTo($section), $this->identicalTo($name))
+                      ->willReturn(true);
+        $this->storage->expects($this->once())
+                      ->method('get')
+                      ->with($this->identicalTo($locale), $this->identicalTo($section), $this->identicalTo($name))
+                      ->willReturn($storageValue);
 
         $translator = $this->getMockBuilder(Translator::class)
                            ->onlyMethods(['applyProcessors'])
                            ->setConstructorArgs([$this->storage])
                            ->getMock();
-        $translator->expects($this->never())
-                   ->method('applyProcessors');
+        $translator->expects($this->once())
+                   ->method('applyProcessors')
+                   ->with(
+                       $this->identicalTo($locale),
+                       $this->identicalTo($storageValue),
+                       $this->identicalTo($parameters),
+                   )
+                   ->willReturn($processedValue);
 
         $result = $this->invokeMethod($translator, 'doTranslate', $locale, $key, $parameters);
 
-        $this->assertSame('', $result);
+        $this->assertSame($processedValue, $result);
     }
 
     /**

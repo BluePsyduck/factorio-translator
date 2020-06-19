@@ -31,7 +31,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "BluePsyduckTest\\FactorioTranslator\\": "test/src/"
+      "BluePsyduckTest\\FactorioTranslator\\": "test/src/",
+      "BluePsyduckIntegrationTest\\FactorioTranslator\\": "test/integration/"
     }
   },
   "scripts": {
@@ -39,10 +40,12 @@
     "phpcbf": "phpcbf -p --colors",
     "phpcs": "phpcs -p --colors",
     "phpstan": "phpstan analyse --no-interaction --ansi",
+    "test-integration": "phpunit --testsuite integration-test --colors=always",
     "test-unit": "phpunit --testsuite unit-test --colors=always --coverage-html=test/coverage --coverage-clover=test/coverage/clover.xml",
     "test": [
       "@test-unit",
       "@coverage-check",
+      "@test-integration",
       "@phpcs",
       "@phpstan"
     ]
