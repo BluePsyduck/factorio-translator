@@ -31,9 +31,9 @@ The library is available through composer. Install the package using the followi
 composer require bluepsyduck/factorio-translator
 ```
 
-## Initialization
+## Usage
 
-Before the translator can be used, it requires some initialization, so it knows what it actually should do.
+The translator requires some setup steps before it can actually be used. Otherwise it won't do much at all.
 
 ### 1. Create instance
 
@@ -64,7 +64,26 @@ The library ships with two loaders, covering the most common use cases:
 - **ModDirectoryLoader:** Loads mods from a directory. This loader can be used to load the `core` and `base` mods from
   the Factorio game itself, as they are shipped uncompressed with the game. 
 
-### 3. Add text processors
+### 3. Load the mods
+
+After the loaders have been added, it is now time to load the mods to use for the translations. Simply add the paths
+to the mods to the translator, and the loaders will take care of the rest:
+
+```php
+
+$translator->loadMod('/path/to/factorio/data/core')
+           ->loadMod('/path/to/factorio/data/base')
+           ->loadMod('/path/to/factorio/mods/my-fancy-mod_1.33.7.zip');
+```
+
+Some notes on loading mods:
+
+- The `core` mod from Factorio should always be loaded first, and the `base` mod should always be loaded second. Not 
+  doing so may lead to missing translations.
+- The order of the mods actually matters: If two mods provide a translation for the same key, the later one added will 
+  win. This is the same is Factorio would do it. Ideally all mods get added in the same order as Factorio loads them.
+
+### 4. Add text processors
 
 The translator uses text processors to process translated strings further. An example of such processing is to replace
 special references in the string with their actual values. While the translator ships with some basic processors, it may
@@ -74,6 +93,16 @@ be required to implement your own processors to get all the features out of the 
 
 The translator comes with some standard processors. It is recommended to always add these to the translator, as they
 handle very basic features of localised strings.
+
+- **PositionPlaceholderProcessor:** Handles position references for parameters like `__1__`.
+- **EntityPlaceholderProcessor:** Handles entity references like `__ENTITY__iron-ore__`, replacing it with the 
+  translated name of the entity.
+- **ItemPlaceholderProcessor:** Handles item references like `__ITEM__electronic-circuit__`, replacing it with the
+  translated name of the item.
+- **PluralPlaceholderProcessor:** Handles the special plural form syntax of Factorio, like 
+  `__plural_for_parameter_1_{1=hour|rest=hours}__`. 
+
+Add these processors as following:
 
 ```php
 use BluePsyduck\FactorioTranslator\Processor\Placeholder\PositionPlaceholderProcessor;
@@ -108,20 +137,38 @@ use BluePsyduck\FactorioTranslator\Processor\Placeholder\AbstractControlPlacehol
 use BluePsyduck\FactorioTranslator\TranslatorAwareInterface;
 use BluePsyduck\FactorioTranslator\TranslatorAwareTrait;
 
-$translator->addProcessor(new class extends AbstractControlPlaceholderProcessor implements TranslatorAwareInterface {
-    use TranslatorAwareTrait;
+$translator->addProcessor(
+    new class extends AbstractControlPlaceholderProcessor implements TranslatorAwareInterface {
+        use TranslatorAwareTrait;
 
-    protected function processControl(string $locale, string $controlName, int $version): ?string
-    {
-        // Use the translated name of the control (as it appears in the options menu), and put it into square brackets. 
-        return '[' . $this->translator->translateWithFallback($locale, ["controls.{$controlName}"]) . ']';
+        protected function processControl(string $locale, string $controlName, int $version): ?string
+        {
+            // Use the translated name of the control (as it appears in the options menu), 
+            // and put it into square brackets. 
+            $control = $this->translator->translateWithFallback($locale, ["controls.{$controlName}"]);
+            return "[{$control}]"; 
+        }
     }
-});
+);
 ```
 
-## Usage
+### 5. Usage
 
-TBC
+After all these steps, it is time to actually use the translator to translate localised strings. This is rather simple:
+
+```php
+echo $translator->translate('en', ['item-name.electronic-circuit']); // Electronic circuit
+echo $translator->translate('de', ['item-name.electronic-circuit']); // Elektronischer Schaltkreis
+```
+
+The first parameter is the locale to translate the localised string into. The values are the same as used by Factorio.
+A list of all locales can be obtained by calling `$translator->getAllLocales()`.
+
+If a translation is not available, `translate()` will return an empty string. If you want to fallback to English 
+instead, use the method `translateWithFallback()` instead.
+
+Note that the localised strings must be specified in PHP syntax, i.e. the lua tables must be transformed to PHP arrays.
+The translator does not understand the lua syntax.
 
 ## Further reading
 
