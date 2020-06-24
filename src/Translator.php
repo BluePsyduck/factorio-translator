@@ -30,9 +30,9 @@ class Translator
      */
     protected array $processors = [];
 
-    public function __construct(Storage $storage)
+    public function __construct(?Storage $storage = null)
     {
-        $this->storage = $storage;
+        $this->storage = $storage ?? new Storage();
     }
 
     /**

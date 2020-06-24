@@ -13,7 +13,6 @@ use BluePsyduck\FactorioTranslator\Processor\Placeholder\PluralPlaceholderProces
 use BluePsyduck\FactorioTranslator\Processor\Placeholder\PositionPlaceholderProcessor;
 use BluePsyduck\FactorioTranslator\Processor\RichText\AbstractContentTagProcessor;
 use BluePsyduck\FactorioTranslator\Processor\RichText\AbstractStandaloneTagProcessor;
-use BluePsyduck\FactorioTranslator\Storage;
 use BluePsyduck\FactorioTranslator\Translator;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +35,7 @@ class TranslatorTest extends TestCase
 
         // We are setting up the translator only once and re-use it through all tests to avoid parsing the locale files
         // for each of the many test cases.
-        $translator = new Translator(new Storage());
+        $translator = new Translator();
         $translator->addLoader(new ModDirectoryLoader());
         $translator->loadMod(__DIR__ . '/../asset/integration');
 
