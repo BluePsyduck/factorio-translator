@@ -77,7 +77,7 @@ class TranslatorTest extends TestCase
         $this->assertSame($translator, $result);
         $this->assertSame($expectedLoaders, $this->extractProperty($translator, 'loaders'));
     }
-    
+
     /**
      * @throws ReflectionException
      * @covers ::addProcessor
@@ -121,7 +121,7 @@ class TranslatorTest extends TestCase
 
         $this->invokeMethod($translator, 'initialize', $instance);
     }
-    
+
     /**
      * @throws ReflectionException
      * @covers ::initialize
