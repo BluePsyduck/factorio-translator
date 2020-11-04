@@ -42,7 +42,7 @@ abstract class AbstractContentTagProcessor implements ProcessorInterface
                     }
 
                     [$name, $value] = array_shift($openedTags);
-                    $content = (string) array_shift($contents);
+                    $content = array_shift($contents);
                     $replacement = $this->processTag($locale, $name, $value, $content);
                     if ($replacement === null) {
                         $contents[0] .= "[{$name}={$value}]{$content}[{$match[4][0]}{$name}]";
