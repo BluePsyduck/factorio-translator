@@ -1,9 +1,9 @@
 # Factorio Translator Library
 
-[![Latest Stable Version](https://poser.pugx.org/bluepsyduck/factorio-translator/v/stable)](https://packagist.org/packages/bluepsyduck/factorio-translator) 
-[![License](https://poser.pugx.org/bluepsyduck/factorio-translator/license)](https://packagist.org/packages/bluepsyduck/factorio-translator) 
-[![Build Status](https://travis-ci.com/BluePsyduck/factorio-translator.svg?branch=master)](https://travis-ci.com/BluePsyduck/factorio-translator) 
-[![codecov](https://codecov.io/gh/BluePsyduck/factorio-translator/branch/master/graph/badge.svg)](https://codecov.io/gh/BluePsyduck/factorio-translator)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BluePsyduck/factorio-translator)](https://github.com/BluePsyduck/factorio-translator/releases)
+[![GitHub](https://img.shields.io/github/license/BluePsyduck/factorio-translator)](LICENSE.md)
+[![build](https://img.shields.io/github/workflow/status/BluePsyduck/factorio-translator/CI?logo=github)](https://github.com/BluePsyduck/factorio-translator/actions)
+[![Codecov](https://img.shields.io/codecov/c/gh/BluePsyduck/factorio-translator?logo=codecov)](https://codecov.io/gh/BluePsyduck/factorio-translator)
 
 The Factorio Translator Library is a library implementing the translator of Factorio in PHP. Given the locale files 
 shipped with the mods it is able to translate the localised strings used by Factorio into any locale provided by the 
