@@ -86,9 +86,6 @@ class TranslatorTest extends TestCase
             ['en', ['recipe-name.fill-barrel', ['fluid-name.lubricant']], 'Fill Lubricant barrel'],
             ['de', ['recipe-name.fill-barrel', ['fluid-name.lubricant']], 'Fülle Lubricant in Fass'],
 
-            // Concatenating
-            ['en', ['', ['color.blue'], ' ' , ['tile-name.refined-concrete']], 'Blue Refined concrete'],
-
             // Control placeholders
             ['en', ['item-description.green-wire'], 'Used to connect machines to the circuit network using {control=0 build}.'],
             ['de', ['item-description.green-wire'], 'Verbindet Maschinen mit dem Schaltungsnetz. {control=2 build}, um Verbindungen zu erzeugen oder zu kappen.'],
@@ -117,6 +114,10 @@ class TranslatorTest extends TestCase
 
             ['en', ['entity-name.imersite'], '{color=173, 19, 173}Imersite cave{/color}'],
             ['de', ['entity-name.imersite'], '{color=173, 19, 173}Imersitgrotte{/color}'],
+
+            // Concatenating
+            ['en', ['', ['color.blue'], ' ' , ['tile-name.refined-concrete']], 'Blue Refined concrete'],
+            ['en', ['', 'foo ', '[item=iron-plate]', ' bar'], 'foo {item=iron-plate} bar'],
         ];
         // phpcs:enable Generic.Files.LineLength
     }
