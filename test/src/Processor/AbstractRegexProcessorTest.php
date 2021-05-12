@@ -15,33 +15,29 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor
+ * @covers \BluePsyduck\FactorioTranslator\Processor\AbstractRegexProcessor
  */
 class AbstractRegexProcessorTest extends TestCase
 {
     use ReflectionTrait;
 
+    private string $pattern = 'foo';
+
     /**
-     * Tests the constructing.
-     * @throws ReflectionException
-     * @covers ::__construct
+     * @param array<string> $mockedMethods
+     * @return AbstractRegexProcessor&MockObject
      */
-    public function testConstruct(): void
+    private function createInstance(array $mockedMethods = []): AbstractRegexProcessor
     {
-        $pattern = 'abc';
-
-        /* @var AbstractRegexProcessor&MockObject $processor */
-        $processor = $this->getMockBuilder(AbstractRegexProcessor::class)
-                          ->setConstructorArgs([$pattern])
-                          ->getMockForAbstractClass();
-
-        $this->assertSame($pattern, $this->extractProperty($processor, 'pattern'));
+        return $this->getMockBuilder(AbstractRegexProcessor::class)
+                    ->disableProxyingToOriginalMethods()
+                    ->onlyMethods($mockedMethods)
+                    ->setConstructorArgs([
+                        $this->pattern,
+                    ])
+                    ->getMockForAbstractClass();
     }
 
-    /**
-     * Tests the process method.
-     * @covers ::process
-     */
     public function testProcess(): void
     {
         $locale = 'foo';
@@ -53,50 +49,42 @@ class AbstractRegexProcessorTest extends TestCase
         ];
         $expectedResult = 'w cba x fed y cba z';
 
-        /* @var AbstractRegexProcessor&MockObject $processor */
-        $processor = $this->getMockBuilder(AbstractRegexProcessor::class)
-                          ->onlyMethods(['findPlaceholders', 'processMatch'])
-                          ->setConstructorArgs(['#.*#'])
-                          ->getMockForAbstractClass();
-        $processor->expects($this->once())
-                  ->method('findPlaceholders')
-                  ->with($this->identicalTo($string))
-                  ->willReturn($placeholders);
-        $processor->expects($this->exactly(2))
-                  ->method('processMatch')
-                  ->withConsecutive(
-                      [$this->identicalTo($locale), $this->identicalTo(['abc', '42']), $this->identicalTo($parameters)],
-                      [$this->identicalTo($locale), $this->identicalTo(['def', '21']), $this->identicalTo($parameters)],
-                  )
-                  ->willReturnOnConsecutiveCalls(
-                      'cba',
-                      'fed',
-                  );
+        $instance = $this->createInstance(['findPlaceholders', 'processMatch']);
+        $instance->expects($this->once())
+                 ->method('findPlaceholders')
+                 ->with($this->identicalTo($string))
+                 ->willReturn($placeholders);
+        $instance->expects($this->exactly(2))
+                 ->method('processMatch')
+                 ->withConsecutive(
+                     [$this->identicalTo($locale), $this->identicalTo(['abc', '42']), $this->identicalTo($parameters)],
+                     [$this->identicalTo($locale), $this->identicalTo(['def', '21']), $this->identicalTo($parameters)],
+                 )
+                 ->willReturnOnConsecutiveCalls(
+                     'cba',
+                     'fed',
+                 );
 
-        $result = $processor->process($locale, $string, $parameters);
+        $result = $instance->process($locale, $string, $parameters);
 
         $this->assertSame($expectedResult, $result);
     }
 
     /**
-     * Tests the findPlaceholders method.
      * @throws ReflectionException
-     * @covers ::findPlaceholders
      */
     public function testFindPlaceholders(): void
     {
-        $pattern = '#([a-z]+)([0-9]+)#';
         $string = 'abc42 def21 abc42';
         $expectedResult = [
             'abc42' => ['abc', '42'],
             'def21' => ['def', '21'],
         ];
 
-        /* @var AbstractRegexProcessor&MockObject $processor */
-        $processor = $this->getMockBuilder(AbstractRegexProcessor::class)
-                          ->setConstructorArgs([$pattern])
-                          ->getMockForAbstractClass();
-        $result = $this->invokeMethod($processor, 'findPlaceholders', $string);
+        $this->pattern = '#([a-z]+)([0-9]+)#';
+
+        $instance = $this->createInstance();
+        $result = $this->invokeMethod($instance, 'findPlaceholders', $string);
 
         $this->assertSame($expectedResult, $result);
     }

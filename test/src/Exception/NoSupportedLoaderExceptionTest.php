@@ -13,13 +13,10 @@ use PHPUnit\Framework\TestCase;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Exception\NoSupportedLoaderException
+ * @covers \BluePsyduck\FactorioTranslator\Exception\NoSupportedLoaderException
  */
 class NoSupportedLoaderExceptionTest extends TestCase
 {
-    /**
-     * @covers ::__construct
-     */
     public function testConstruct(): void
     {
         $path = 'abc';

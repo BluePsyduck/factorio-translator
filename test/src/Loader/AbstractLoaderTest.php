@@ -16,16 +16,36 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Loader\AbstractLoader
+ * @covers \BluePsyduck\FactorioTranslator\Loader\AbstractLoader
  */
 class AbstractLoaderTest extends TestCase
 {
     use ReflectionTrait;
 
+    /** @var Storage&MockObject */
+    private Storage $storage;
+
+    protected function setUp(): void
+    {
+        $this->storage = $this->createMock(Storage::class);
+    }
+
     /**
-     * Tests the parseContents method.
+     * @param array<string> $mockedMethods
+     * @return AbstractLoader&MockObject
+     */
+    private function createInstance(array $mockedMethods = []): AbstractLoader
+    {
+        $instance = $this->getMockBuilder(AbstractLoader::class)
+                         ->disableProxyingToOriginalMethods()
+                         ->onlyMethods($mockedMethods)
+                         ->getMockForAbstractClass();
+        $instance->setStorage($this->storage);
+        return $instance;
+    }
+
+    /**
      * @throws ReflectionException
-     * @covers ::parseContents
      */
     public function testParseContents(): void
     {
@@ -39,35 +59,30 @@ class AbstractLoaderTest extends TestCase
         abc=pqr 
         EOT;
 
-        $storage = $this->createMock(Storage::class);
-        $storage->expects($this->exactly(3))
-                ->method('set')
-                ->withConsecutive(
-                    [
-                        $this->identicalTo($locale),
-                        $this->identicalTo(''),
-                        $this->identicalTo('abc'),
-                        $this->identicalTo('def'),
-                    ],
-                    [
-                        $this->identicalTo($locale),
-                        $this->identicalTo(''),
-                        $this->identicalTo('ghi'),
-                        $this->identicalTo('jkl'),
-                    ],
-                    [
-                        $this->identicalTo($locale),
-                        $this->identicalTo('mno'),
-                        $this->identicalTo('abc'),
-                        $this->identicalTo('pqr '),
-                    ],
-                );
+        $this->storage->expects($this->exactly(3))
+                      ->method('set')
+                      ->withConsecutive(
+                          [
+                              $this->identicalTo($locale),
+                              $this->identicalTo(''),
+                              $this->identicalTo('abc'),
+                              $this->identicalTo('def'),
+                          ],
+                          [
+                              $this->identicalTo($locale),
+                              $this->identicalTo(''),
+                              $this->identicalTo('ghi'),
+                              $this->identicalTo('jkl'),
+                          ],
+                          [
+                              $this->identicalTo($locale),
+                              $this->identicalTo('mno'),
+                              $this->identicalTo('abc'),
+                              $this->identicalTo('pqr '),
+                          ],
+                      );
 
-        /* @var AbstractLoader&MockObject $loader */
-        $loader = $this->getMockBuilder(AbstractLoader::class)
-                       ->getMockForAbstractClass();
-        $loader->setStorage($storage);
-
-        $this->invokeMethod($loader, 'parseContents', $locale, $contents);
+        $instance = $this->createInstance();
+        $this->invokeMethod($instance, 'parseContents', $locale, $contents);
     }
 }

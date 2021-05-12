@@ -59,13 +59,13 @@ class Translator
         return $this;
     }
 
-    protected function initialize(object $instance): void
+    protected function initialize(object $object): void
     {
-        if ($instance instanceof StorageAwareInterface) {
-            $instance->setStorage($this->storage);
+        if ($object instanceof StorageAwareInterface) {
+            $object->setStorage($this->storage);
         }
-        if ($instance instanceof TranslatorAwareInterface) {
-            $instance->setTranslator($this);
+        if ($object instanceof TranslatorAwareInterface) {
+            $object->setTranslator($this);
         }
     }
 

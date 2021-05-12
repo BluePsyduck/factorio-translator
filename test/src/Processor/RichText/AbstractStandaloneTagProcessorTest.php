@@ -6,6 +6,7 @@ namespace BluePsyduckTest\FactorioTranslator\Processor\RichText;
 
 use BluePsyduck\FactorioTranslator\Processor\RichText\AbstractStandaloneTagProcessor;
 use BluePsyduck\TestHelper\ReflectionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -14,27 +15,26 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Processor\RichText\AbstractStandaloneTagProcessor
+ * @covers \BluePsyduck\FactorioTranslator\Processor\RichText\AbstractStandaloneTagProcessor
  */
 class AbstractStandaloneTagProcessorTest extends TestCase
 {
     use ReflectionTrait;
 
     /**
-     * @throws ReflectionException
-     * @covers ::__construct
+     * @param array<string> $mockedMethods
+     * @return AbstractStandaloneTagProcessor&MockObject
      */
-    public function testConstruct(): void
+    private function createInstance(array $mockedMethods = []): AbstractStandaloneTagProcessor
     {
-        $processor = $this->getMockBuilder(AbstractStandaloneTagProcessor::class)
-                          ->getMockForAbstractClass();
-
-        $this->assertGreaterThan(0, strlen($this->extractProperty($processor, 'pattern')));
+        return $this->getMockBuilder(AbstractStandaloneTagProcessor::class)
+                    ->disableProxyingToOriginalMethods()
+                    ->onlyMethods($mockedMethods)
+                    ->getMockForAbstractClass();
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::processMatch
      */
     public function testProcessMatch(): void
     {
@@ -45,26 +45,23 @@ class AbstractStandaloneTagProcessorTest extends TestCase
         $expectedValue = 'def';
         $processedValue = 'jkl';
 
-        $processor = $this->getMockBuilder(AbstractStandaloneTagProcessor::class)
-                          ->onlyMethods(['processTag'])
-                          ->getMockForAbstractClass();
-        $processor->expects($this->once())
-                  ->method('processTag')
-                  ->with(
-                      $this->identicalTo($locale),
-                      $this->identicalTo($expectedName),
-                      $this->identicalTo($expectedValue),
-                  )
-                  ->willReturn($processedValue);
+        $instance = $this->createInstance(['processTag']);
+        $instance->expects($this->once())
+                 ->method('processTag')
+                 ->with(
+                     $this->identicalTo($locale),
+                     $this->identicalTo($expectedName),
+                     $this->identicalTo($expectedValue),
+                 )
+                 ->willReturn($processedValue);
 
-        $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
+        $result = $this->invokeMethod($instance, 'processMatch', $locale, $values, $parameters);
 
         $this->assertSame($processedValue, $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::processMatch
      */
     public function testProcessMatchWithUnknownName(): void
     {
@@ -72,13 +69,11 @@ class AbstractStandaloneTagProcessorTest extends TestCase
         $values = ['invalid', 'def'];
         $parameters = ['ghi'];
 
-        $processor = $this->getMockBuilder(AbstractStandaloneTagProcessor::class)
-                          ->onlyMethods(['processTag'])
-                          ->getMockForAbstractClass();
-        $processor->expects($this->never())
-                  ->method('processTag');
+        $instance = $this->createInstance(['processTag']);
+        $instance->expects($this->never())
+                 ->method('processTag');
 
-        $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
+        $result = $this->invokeMethod($instance, 'processMatch', $locale, $values, $parameters);
 
         $this->assertNull($result);
     }

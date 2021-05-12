@@ -13,10 +13,22 @@ use PHPUnit\Framework\TestCase;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Loader\ModDirectoryLoader
+ * @covers \BluePsyduck\FactorioTranslator\Loader\ModDirectoryLoader
  */
 class ModDirectoryLoaderTest extends TestCase
 {
+    /**
+     * @param array<string> $mockedMethods
+     * @return ModDirectoryLoader&MockObject
+     */
+    private function createInstance(array $mockedMethods = []): ModDirectoryLoader
+    {
+        return $this->getMockBuilder(ModDirectoryLoader::class)
+                    ->disableProxyingToOriginalMethods()
+                    ->onlyMethods($mockedMethods)
+                    ->getMock();
+    }
+
     /**
      * @return array<mixed>
      */
@@ -31,35 +43,27 @@ class ModDirectoryLoaderTest extends TestCase
     /**
      * @param string $path
      * @param bool $expectedResult
-     * @covers ::supports
      * @dataProvider provideSupports
      */
     public function testSupports(string $path, bool $expectedResult): void
     {
-        $loader = new ModDirectoryLoader();
-        $result = $loader->supports($path);
+        $instance = $this->createInstance();
+        $result = $instance->supports($path);
 
         $this->assertSame($expectedResult, $result);
     }
 
-    /**
-     * Tests the load method.
-     * @covers ::load
-     */
     public function testLoad(): void
     {
         $path = __DIR__ . '/../../asset/mod-directory';
         $expectedLocale = 'foo';
         $expectedContents = "foo=bar\n";
 
-        /* @var ModDirectoryLoader&MockObject $loader */
-        $loader = $this->getMockBuilder(ModDirectoryLoader::class)
-                       ->onlyMethods(['parseContents'])
-                       ->getMock();
-        $loader->expects($this->once())
-               ->method('parseContents')
-               ->with($this->identicalTo($expectedLocale), $this->identicalTo($expectedContents));
+        $instance = $this->createInstance(['parseContents']);
+        $instance->expects($this->once())
+                 ->method('parseContents')
+                 ->with($this->identicalTo($expectedLocale), $this->identicalTo($expectedContents));
 
-        $loader->load($path);
+        $instance->load($path);
     }
 }
