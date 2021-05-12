@@ -212,11 +212,19 @@ class TranslatorTest extends TestCase
     {
         $locale = 'abc';
         $localisedString = 'def';
+        $processedString = 'ghi';
 
-        $translator = new Translator($this->storage);
+        $translator = $this->getMockBuilder(Translator::class)
+                           ->onlyMethods(['applyProcessors'])
+                           ->setConstructorArgs([$this->storage])
+                           ->getMock();
+        $translator->expects($this->once())
+                   ->method('applyProcessors')
+                   ->with($this->identicalTo($locale), $this->identicalTo($localisedString), $this->identicalTo([]))
+                   ->willReturn($processedString);
         $result = $translator->translate($locale, $localisedString);
 
-        $this->assertSame($localisedString, $result);
+        $this->assertSame($processedString, $result);
     }
 
     /**
