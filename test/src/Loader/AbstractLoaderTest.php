@@ -36,7 +36,7 @@ class AbstractLoaderTest extends TestCase
             ghi=jkl
         ;fail=comment
         [mno]
-        abc=pqr
+        abc=pqr 
         EOT;
 
         $storage = $this->createMock(Storage::class);
@@ -59,7 +59,7 @@ class AbstractLoaderTest extends TestCase
                         $this->identicalTo($locale),
                         $this->identicalTo('mno'),
                         $this->identicalTo('abc'),
-                        $this->identicalTo('pqr'),
+                        $this->identicalTo('pqr '),
                     ],
                 );
 
