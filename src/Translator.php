@@ -95,7 +95,7 @@ class Translator
     public function translate(string $locale, $localisedString): string
     {
         if (!is_array($localisedString)) {
-            return (string) $localisedString;
+            return $this->applyProcessors($locale, (string) $localisedString, []);
         }
 
         $firstValue = array_shift($localisedString);
