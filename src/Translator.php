@@ -21,12 +21,12 @@ class Translator
     protected Storage $storage;
 
     /**
-     * @var array<LoaderInterface>|LoaderInterface[]
+     * @var array<LoaderInterface>
      */
     protected array $loaders;
 
     /**
-     * @var array<ProcessorInterface>|ProcessorInterface[]
+     * @var array<ProcessorInterface>
      */
     protected array $processors = [];
 
@@ -155,8 +155,7 @@ class Translator
         }
 
         $result = $this->storage->get($locale, $section, $name);
-        $result = $this->applyProcessors($locale, $result, $parameters);
-        return $result;
+        return $this->applyProcessors($locale, $result, $parameters);
     }
 
     /**
@@ -176,7 +175,7 @@ class Translator
 
     /**
      * Returns all locales currently available to any of the translations.
-     * @return array<string>|string[]
+     * @return array<string>
      */
     public function getAllLocales(): array
     {
