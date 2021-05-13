@@ -21,9 +21,10 @@ abstract class AbstractLoader implements StorageAwareInterface
     {
         $section = '';
         foreach (explode(PHP_EOL, $contents) as $line) {
-            $line = ltrim($line);
+            $line = trim($line, "\r"); // Remove Windows linebreak remains
+            $trimmedLine = trim($line);
 
-            if (substr($line, 0, 1) === ';') {
+            if (substr($trimmedLine, 0, 1) === ';') {
                 continue;
             } elseif (strpos($line, '=') !== false) {
                 [$name, $value] = explode('=', $line, 2);
@@ -31,9 +32,9 @@ abstract class AbstractLoader implements StorageAwareInterface
                 // Fix line breaks to be actual line breaks.
                 $value = str_replace('\n', PHP_EOL, $value);
 
-                $this->storage->set($locale, $section, $name, $value);
-            } elseif (substr($line, 0, 1) === '[' && substr($line, -1) === ']') {
-                $section = substr($line, 1, -1);
+                $this->storage->set($locale, $section, trim($name), $value);
+            } elseif (substr($trimmedLine, 0, 1) === '[' && substr($trimmedLine, -1) === ']') {
+                $section = substr($trimmedLine, 1, -1);
             }
         }
     }
