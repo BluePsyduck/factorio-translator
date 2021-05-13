@@ -7,6 +7,7 @@ namespace BluePsyduckTest\FactorioTranslator\Processor\Placeholder;
 use BluePsyduck\FactorioTranslator\Processor\Placeholder\EntityPlaceholderProcessor;
 use BluePsyduck\FactorioTranslator\Translator;
 use BluePsyduck\TestHelper\ReflectionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -15,26 +16,36 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Processor\Placeholder\EntityPlaceholderProcessor
+ * @covers \BluePsyduck\FactorioTranslator\Processor\Placeholder\EntityPlaceholderProcessor
  */
 class EntityPlaceholderProcessorTest extends TestCase
 {
     use ReflectionTrait;
 
-    /**
-     * @throws ReflectionException
-     * @covers ::__construct
-     */
-    public function testConstruct(): void
-    {
-        $processor = new EntityPlaceholderProcessor();
+    /** @var Translator&MockObject */
+    private Translator $translator;
 
-        $this->assertGreaterThan(0, strlen($this->extractProperty($processor, 'pattern')));
+    protected function setUp(): void
+    {
+        $this->translator = $this->createMock(Translator::class);
+    }
+
+    /**
+     * @param array<string> $mockedMethods
+     * @return EntityPlaceholderProcessor&MockObject
+     */
+    private function createInstance(array $mockedMethods = []): EntityPlaceholderProcessor
+    {
+        $instance = $this->getMockBuilder(EntityPlaceholderProcessor::class)
+                         ->disableProxyingToOriginalMethods()
+                         ->onlyMethods($mockedMethods)
+                         ->getMock();
+        $instance->setTranslator($this->translator);
+        return $instance;
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::processMatch
      */
     public function testProcessMatch(): void
     {
@@ -44,16 +55,13 @@ class EntityPlaceholderProcessorTest extends TestCase
         $expectedLocalisedString = ['entity-name.def'];
         $translatedValue = 'jkl';
 
-        $translator = $this->createMock(Translator::class);
-        $translator->expects($this->once())
-                   ->method('translateWithFallback')
-                   ->with($this->identicalTo($locale), $this->identicalTo($expectedLocalisedString))
-                   ->willReturn($translatedValue);
+        $this->translator->expects($this->once())
+                         ->method('translateWithFallback')
+                         ->with($this->identicalTo($locale), $this->identicalTo($expectedLocalisedString))
+                         ->willReturn($translatedValue);
 
-        $processor = new EntityPlaceholderProcessor();
-        $processor->setTranslator($translator);
-
-        $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
+        $instance = $this->createInstance();
+        $result = $this->invokeMethod($instance, 'processMatch', $locale, $values, $parameters);
 
         $this->assertSame($translatedValue, $result);
     }

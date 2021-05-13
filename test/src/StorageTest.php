@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BluePsyduckTest\FactorioTranslator;
 
 use BluePsyduck\FactorioTranslator\Storage;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -12,46 +13,50 @@ use PHPUnit\Framework\TestCase;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Storage
+ * @covers \BluePsyduck\FactorioTranslator\Storage
  */
 class StorageTest extends TestCase
 {
     /**
-     * @covers ::get
-     * @covers ::has
-     * @covers ::set
+     * @param array<string> $mockedMethods
+     * @return Storage&MockObject
      */
-    public function testSetGetAndHas(): void
+    private function createInstance(array $mockedMethods = []): Storage
     {
-        $storage = new Storage();
-
-        $this->assertFalse($storage->has('abc', 'def', 'ghi'));
-        $this->assertSame('', $storage->get('abc', 'def', 'ghi'));
-
-        $storage->set('abc', 'def', 'ghi', 'jkl');
-        $this->assertTrue($storage->has('abc', 'def', 'ghi'));
-        $this->assertSame('jkl', $storage->get('abc', 'def', 'ghi'));
-
-        $storage->set('abc', 'mno', 'ghi', 'pqr');
-        $this->assertSame('jkl', $storage->get('abc', 'def', 'ghi'));
-        $this->assertSame('pqr', $storage->get('abc', 'mno', 'ghi'));
-
-        $storage->set('abc', 'def', 'ghi', 'stu');
-        $this->assertSame('stu', $storage->get('abc', 'def', 'ghi'));
+        return $this->getMockBuilder(Storage::class)
+                    ->disableProxyingToOriginalMethods()
+                    ->onlyMethods($mockedMethods)
+                    ->getMock();
     }
 
-    /**
-     * @covers ::getLocales
-     */
+    public function testSetGetAndHas(): void
+    {
+        $instance = $this->createInstance();
+
+        $this->assertFalse($instance->has('abc', 'def', 'ghi'));
+        $this->assertSame('', $instance->get('abc', 'def', 'ghi'));
+
+        $instance->set('abc', 'def', 'ghi', 'jkl');
+        $this->assertTrue($instance->has('abc', 'def', 'ghi'));
+        $this->assertSame('jkl', $instance->get('abc', 'def', 'ghi'));
+
+        $instance->set('abc', 'mno', 'ghi', 'pqr');
+        $this->assertSame('jkl', $instance->get('abc', 'def', 'ghi'));
+        $this->assertSame('pqr', $instance->get('abc', 'mno', 'ghi'));
+
+        $instance->set('abc', 'def', 'ghi', 'stu');
+        $this->assertSame('stu', $instance->get('abc', 'def', 'ghi'));
+    }
+
     public function testGetLocales(): void
     {
-        $storage = new Storage();
+        $instance = $this->createInstance();
 
-        $storage->set('foo', 'abc', 'def', 'ghi');
-        $storage->set('foo', 'jkl', 'mno', 'pqr');
-        $storage->set('bar', 'stu', 'vwx', 'yza');
+        $instance->set('foo', 'abc', 'def', 'ghi');
+        $instance->set('foo', 'jkl', 'mno', 'pqr');
+        $instance->set('bar', 'stu', 'vwx', 'yza');
 
-        $result = $storage->getLocales();
+        $result = $instance->getLocales();
         $this->assertSame(['foo', 'bar'], $result);
     }
 }

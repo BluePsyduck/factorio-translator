@@ -7,6 +7,7 @@ namespace BluePsyduckTest\FactorioTranslator\Processor\Placeholder;
 use BluePsyduck\FactorioTranslator\Processor\Placeholder\PluralPlaceholderProcessor;
 use BluePsyduck\FactorioTranslator\Translator;
 use BluePsyduck\TestHelper\ReflectionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -15,27 +16,36 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Processor\Placeholder\PluralPlaceholderProcessor
+ * @covers \BluePsyduck\FactorioTranslator\Processor\Placeholder\PluralPlaceholderProcessor
  */
 class PluralPlaceholderProcessorTest extends TestCase
 {
     use ReflectionTrait;
 
-    /**
-     * @throws ReflectionException
-     * @covers ::__construct
-     */
-    public function testConstruct(): void
-    {
-        $processor = new PluralPlaceholderProcessor();
+    /** @var Translator&MockObject */
+    private Translator $translator;
 
-        $this->assertGreaterThan(0, strlen($this->extractProperty($processor, 'pattern')));
+    protected function setUp(): void
+    {
+        $this->translator = $this->createMock(Translator::class);
     }
 
     /**
-     * Tests the processMatch method.
+     * @param array<string> $mockedMethods
+     * @return PluralPlaceholderProcessor&MockObject
+     */
+    private function createInstance(array $mockedMethods = []): PluralPlaceholderProcessor
+    {
+        $instance = $this->getMockBuilder(PluralPlaceholderProcessor::class)
+                         ->disableProxyingToOriginalMethods()
+                         ->onlyMethods($mockedMethods)
+                         ->getMock();
+        $instance->setTranslator($this->translator);
+        return $instance;
+    }
+
+    /**
      * @throws ReflectionException
-     * @covers ::processMatch
      */
     public function testProcessMatch(): void
     {
@@ -46,27 +56,23 @@ class PluralPlaceholderProcessorTest extends TestCase
         $expectedConditions = 'def';
         $translatedValue = 'ghi';
 
-        $processor = $this->getMockBuilder(PluralPlaceholderProcessor::class)
-                          ->onlyMethods(['processConditions'])
-                          ->getMock();
-        $processor->expects($this->once())
-                  ->method('processConditions')
-                  ->with(
-                      $this->identicalTo($locale),
-                      $this->identicalTo($expectedConditions),
-                      $this->identicalTo($expectedParameter)
-                  )
-                  ->willReturn($translatedValue);
+        $instance = $this->createInstance(['processConditions']);
+        $instance->expects($this->once())
+                 ->method('processConditions')
+                 ->with(
+                     $this->identicalTo($locale),
+                     $this->identicalTo($expectedConditions),
+                     $this->identicalTo($expectedParameter)
+                 )
+                 ->willReturn($translatedValue);
 
-        $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
+        $result = $this->invokeMethod($instance, 'processMatch', $locale, $values, $parameters);
 
         $this->assertSame($translatedValue, $result);
     }
 
     /**
-     * Tests the processMatch method.
      * @throws ReflectionException
-     * @covers ::processMatch
      */
     public function testProcessMatchWithMissingParameter(): void
     {
@@ -74,20 +80,17 @@ class PluralPlaceholderProcessorTest extends TestCase
         $values = ['2', 'def'];
         $parameters = ['42'];
 
-        $processor = $this->getMockBuilder(PluralPlaceholderProcessor::class)
-                          ->onlyMethods(['processConditions'])
-                          ->getMock();
-        $processor->expects($this->never())
-                  ->method('processConditions');
+        $instance = $this->createInstance(['processConditions']);
+        $instance->expects($this->never())
+                 ->method('processConditions');
 
-        $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
+        $result = $this->invokeMethod($instance, 'processMatch', $locale, $values, $parameters);
 
         $this->assertNull($result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::processConditions
      */
     public function testProcessConditions(): void
     {
@@ -97,37 +100,36 @@ class PluralPlaceholderProcessorTest extends TestCase
         $expectedString = 'mno';
         $translatedValue = 'stu';
 
-        $translator = $this->createMock(Translator::class);
-        $translator->expects($this->once())
-                   ->method('applyProcessors')
-                   ->with($this->identicalTo($locale), $this->identicalTo($expectedString), $this->identicalTo([]))
-                   ->willReturn($translatedValue);
+        $this->translator->expects($this->once())
+                         ->method('applyProcessors')
+                         ->with(
+                             $this->identicalTo($locale),
+                             $this->identicalTo($expectedString),
+                             $this->identicalTo([]),
+                         )
+                         ->willReturn($translatedValue);
 
-        $processor = $this->getMockBuilder(PluralPlaceholderProcessor::class)
-                          ->onlyMethods(['evaluateCondition'])
-                          ->getMock();
-        $processor->expects($this->exactly(3))
-                  ->method('evaluateCondition')
-                  ->withConsecutive(
-                      [$this->identicalTo('abc'), $this->identicalTo($number)],
-                      [$this->identicalTo('def'), $this->identicalTo($number)],
-                      [$this->identicalTo('jkl'), $this->identicalTo($number)],
-                  )
-                  ->willReturnOnConsecutiveCalls(
-                      false,
-                      false,
-                      true,
-                  );
-        $processor->setTranslator($translator);
+        $instance = $this->createInstance(['evaluateCondition']);
+        $instance->expects($this->exactly(3))
+                 ->method('evaluateCondition')
+                 ->withConsecutive(
+                     [$this->identicalTo('abc'), $this->identicalTo($number)],
+                     [$this->identicalTo('def'), $this->identicalTo($number)],
+                     [$this->identicalTo('jkl'), $this->identicalTo($number)],
+                 )
+                 ->willReturnOnConsecutiveCalls(
+                     false,
+                     false,
+                     true,
+                 );
 
-        $result = $this->invokeMethod($processor, 'processConditions', $locale, $conditions, $number);
+        $result = $this->invokeMethod($instance, 'processConditions', $locale, $conditions, $number);
 
         $this->assertSame($translatedValue, $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::processConditions
      */
     public function testProcessConditionsWithoutMatch(): void
     {
@@ -135,20 +137,16 @@ class PluralPlaceholderProcessorTest extends TestCase
         $conditions = 'invalid|invalid=abc';
         $number = 42;
 
-        $translator = $this->createMock(Translator::class);
-        $translator->expects($this->never())
-                   ->method('applyProcessors');
+        $this->translator->expects($this->never())
+                         ->method('applyProcessors');
 
-        $processor = $this->getMockBuilder(PluralPlaceholderProcessor::class)
-                          ->onlyMethods(['evaluateCondition'])
-                          ->getMock();
-        $processor->expects($this->once())
-                  ->method('evaluateCondition')
-                  ->with($this->identicalTo('invalid'), $this->identicalTo($number))
-                  ->willReturn(false);
-        $processor->setTranslator($translator);
+        $instance = $this->createInstance(['evaluateCondition']);
+        $instance->expects($this->once())
+                 ->method('evaluateCondition')
+                 ->with($this->identicalTo('invalid'), $this->identicalTo($number))
+                 ->willReturn(false);
 
-        $result = $this->invokeMethod($processor, 'processConditions', $locale, $conditions, $number);
+        $result = $this->invokeMethod($instance, 'processConditions', $locale, $conditions, $number);
 
         $this->assertNull($result);
     }
@@ -180,13 +178,12 @@ class PluralPlaceholderProcessorTest extends TestCase
      * @param int $number
      * @param bool $expectedResult
      * @throws ReflectionException
-     * @covers ::evaluateCondition
      * @dataProvider provideEvaluateCondition
      */
     public function testEvaluateCondition(string $condition, int $number, bool $expectedResult): void
     {
-        $processor = new PluralPlaceholderProcessor();
-        $result = $this->invokeMethod($processor, 'evaluateCondition', $condition, $number);
+        $instance = $this->createInstance();
+        $result = $this->invokeMethod($instance, 'evaluateCondition', $condition, $number);
 
         $this->assertSame($expectedResult, $result);
     }

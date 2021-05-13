@@ -21,38 +21,37 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Translator
+ * @covers \BluePsyduck\FactorioTranslator\Translator
  */
 class TranslatorTest extends TestCase
 {
     use ReflectionTrait;
 
-    /**
-     * @var Storage&MockObject
-     */
-    protected $storage;
+    /** @var Storage&MockObject */
+    private Storage $storage;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->storage = $this->createMock(Storage::class);
     }
 
     /**
-     * @throws ReflectionException
-     * @covers ::__construct
+     * @param array<string> $mockedMethods
+     * @return Translator&MockObject
      */
-    public function testConstruct(): void
+    private function createInstance(array $mockedMethods = []): Translator
     {
-        $translator = new Translator($this->storage);
-
-        $this->assertSame($this->storage, $this->extractProperty($translator, 'storage'));
+        return $this->getMockBuilder(Translator::class)
+                    ->disableProxyingToOriginalMethods()
+                    ->onlyMethods($mockedMethods)
+                    ->setConstructorArgs([
+                        $this->storage,
+                    ])
+                    ->getMock();
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::addLoader
      */
     public function testAddLoader(): void
     {
@@ -63,24 +62,20 @@ class TranslatorTest extends TestCase
         $loaders = [$loader1, $loader2];
         $expectedLoaders = [$loader1, $loader2, $loader3];
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['initialize'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('initialize')
-                   ->with($this->identicalTo($loader3));
-        $this->injectProperty($translator, 'loaders', $loaders);
+        $instance = $this->createInstance(['initialize']);
+        $instance->expects($this->once())
+                 ->method('initialize')
+                 ->with($this->identicalTo($loader3));
+        $this->injectProperty($instance, 'loaders', $loaders);
 
-        $result = $translator->addLoader($loader3);
+        $result = $instance->addLoader($loader3);
 
-        $this->assertSame($translator, $result);
-        $this->assertSame($expectedLoaders, $this->extractProperty($translator, 'loaders'));
+        $this->assertSame($instance, $result);
+        $this->assertSame($expectedLoaders, $this->extractProperty($instance, 'loaders'));
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::addProcessor
      */
     public function testAddProcessor(): void
     {
@@ -91,57 +86,51 @@ class TranslatorTest extends TestCase
         $processors = [$processor1, $processor2];
         $expectedProcessors = [$processor1, $processor2, $processor3];
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['initialize'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('initialize')
-                   ->with($this->identicalTo($processor3));
-        $this->injectProperty($translator, 'processors', $processors);
+        $instance = $this->createInstance(['initialize']);
+        $instance->expects($this->once())
+                 ->method('initialize')
+                 ->with($this->identicalTo($processor3));
+        $this->injectProperty($instance, 'processors', $processors);
 
-        $result = $translator->addProcessor($processor3);
+        $result = $instance->addProcessor($processor3);
 
-        $this->assertSame($translator, $result);
-        $this->assertSame($expectedProcessors, $this->extractProperty($translator, 'processors'));
+        $this->assertSame($instance, $result);
+        $this->assertSame($expectedProcessors, $this->extractProperty($instance, 'processors'));
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::initialize
      */
     public function testInitializeWithStorageInterface(): void
     {
-        $translator = new Translator($this->storage);
+        $instance = $this->createInstance();
 
-        $instance = $this->createMock(StorageAwareInterface::class);
-        $instance->expects($this->once())
-                 ->method('setStorage')
-                 ->with($this->identicalTo($this->storage));
+        $object = $this->createMock(StorageAwareInterface::class);
+        $object->expects($this->once())
+               ->method('setStorage')
+               ->with($this->identicalTo($this->storage));
 
-        $this->invokeMethod($translator, 'initialize', $instance);
+        $this->invokeMethod($instance, 'initialize', $object);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::initialize
      */
     public function testInitializeWithTranslatorInterface(): void
     {
-        $translator = new Translator($this->storage);
+        $instance = $this->createInstance();
 
-        $instance = $this->createMock(TranslatorAwareInterface::class);
-        $instance->expects($this->once())
-                 ->method('setTranslator')
-                 ->with($this->identicalTo($translator));
+        $object = $this->createMock(TranslatorAwareInterface::class);
+        $object->expects($this->once())
+               ->method('setTranslator')
+               ->with($this->identicalTo($instance));
 
-        $this->invokeMethod($translator, 'initialize', $instance);
+        $this->invokeMethod($instance, 'initialize', $object);
     }
 
     /**
      * @throws NoSupportedLoaderException
      * @throws ReflectionException
-     * @covers ::loadMod
      */
     public function testLoadMod(): void
     {
@@ -164,18 +153,17 @@ class TranslatorTest extends TestCase
                 ->method('load')
                 ->with($this->identicalTo($path));
 
-        $translator = new Translator($this->storage);
-        $this->injectProperty($translator, 'loaders', [$loader1, $loader2]);
+        $instance = $this->createInstance();
+        $this->injectProperty($instance, 'loaders', [$loader1, $loader2]);
 
-        $result = $translator->loadMod($path);
+        $result = $instance->loadMod($path);
 
-        $this->assertSame($translator, $result);
+        $this->assertSame($instance, $result);
     }
 
     /**
      * @throws NoSupportedLoaderException
      * @throws ReflectionException
-     * @covers ::loadMod
      */
     public function testLoadModWithException(): void
     {
@@ -199,37 +187,28 @@ class TranslatorTest extends TestCase
 
         $this->expectException(NoSupportedLoaderException::class);
 
-        $translator = new Translator($this->storage);
-        $this->injectProperty($translator, 'loaders', [$loader1, $loader2]);
+        $instance = $this->createInstance();
+        $this->injectProperty($instance, 'loaders', [$loader1, $loader2]);
 
-        $translator->loadMod($path);
+        $instance->loadMod($path);
     }
 
-    /**
-     * @covers ::translate
-     */
     public function testTranslateWithUntranslatedValue(): void
     {
         $locale = 'abc';
         $localisedString = 'def';
         $processedString = 'ghi';
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['applyProcessors'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('applyProcessors')
-                   ->with($this->identicalTo($locale), $this->identicalTo($localisedString), $this->identicalTo([]))
-                   ->willReturn($processedString);
-        $result = $translator->translate($locale, $localisedString);
+        $instance = $this->createInstance(['applyProcessors']);
+        $instance->expects($this->once())
+                 ->method('applyProcessors')
+                 ->with($this->identicalTo($locale), $this->identicalTo($localisedString), $this->identicalTo([]))
+                 ->willReturn($processedString);
+        $result = $instance->translate($locale, $localisedString);
 
         $this->assertSame($processedString, $result);
     }
 
-    /**
-     * @covers ::translate
-     */
     public function testTranslateWithConcatenatedValue(): void
     {
         $locale = 'abc';
@@ -237,23 +216,17 @@ class TranslatorTest extends TestCase
         $parts = ['def', 'ghi'];
         $concatenatedValue = 'jkl';
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['concatenate'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('concatenate')
-                   ->with($this->identicalTo($locale), $this->identicalTo($parts))
-                   ->willReturn($concatenatedValue);
+        $instance = $this->createInstance(['concatenate']);
+        $instance->expects($this->once())
+                 ->method('concatenate')
+                 ->with($this->identicalTo($locale), $this->identicalTo($parts))
+                 ->willReturn($concatenatedValue);
 
-        $result = $translator->translate($locale, $localisedString);
+        $result = $instance->translate($locale, $localisedString);
 
         $this->assertSame($concatenatedValue, $result);
     }
 
-    /**
-     * @covers ::translate
-     */
     public function testTranslateWithActualTranslation(): void
     {
         $locale = 'abc';
@@ -262,75 +235,59 @@ class TranslatorTest extends TestCase
         $parameters = ['ghi', 'jkl'];
         $translatedString = 'mno';
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['doTranslate'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('doTranslate')
-                   ->with($this->identicalTo($locale), $this->identicalTo($key), $this->identicalTo($parameters))
-                   ->willReturn($translatedString);
+        $instance = $this->createInstance(['doTranslate']);
+        $instance->expects($this->once())
+                 ->method('doTranslate')
+                 ->with($this->identicalTo($locale), $this->identicalTo($key), $this->identicalTo($parameters))
+                 ->willReturn($translatedString);
 
-        $result = $translator->translate($locale, $localisedString);
+        $result = $instance->translate($locale, $localisedString);
 
         $this->assertSame($translatedString, $result);
     }
 
-    /**
-     * @covers ::translateWithFallback
-     */
     public function testTranslateWithFallback(): void
     {
         $locale = 'abc';
         $localisedString = ['def'];
         $translation = 'ghi';
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['translate'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->exactly(2))
-                   ->method('translate')
-                   ->withConsecutive(
-                       [$this->identicalTo($locale), $this->identicalTo($localisedString)],
-                       [$this->identicalTo('en'), $this->identicalTo($localisedString)],
-                   )
-                   ->willReturnOnConsecutiveCalls(
-                       '',
-                       $translation,
-                   );
+        $instance = $this->createInstance(['translate']);
+        $instance->expects($this->exactly(2))
+                 ->method('translate')
+                 ->withConsecutive(
+                     [$this->identicalTo($locale), $this->identicalTo($localisedString)],
+                     [$this->identicalTo('en'), $this->identicalTo($localisedString)],
+                 )
+                 ->willReturnOnConsecutiveCalls(
+                     '',
+                     $translation,
+                 );
 
-        $result = $translator->translateWithFallback($locale, $localisedString);
+        $result = $instance->translateWithFallback($locale, $localisedString);
 
         $this->assertSame($translation, $result);
     }
 
-    /**
-     * @covers ::translateWithFallback
-     */
     public function testTranslateWithFallbackWithoutFallback(): void
     {
         $locale = 'abc';
         $localisedString = ['def'];
         $translation = 'ghi';
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['translate'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('translate')
-                   ->with($this->identicalTo($locale), $this->identicalTo($localisedString))
-                   ->willReturn($translation);
+        $instance = $this->createInstance(['translate']);
+        $instance->expects($this->once())
+                 ->method('translate')
+                 ->with($this->identicalTo($locale), $this->identicalTo($localisedString))
+                 ->willReturn($translation);
 
-        $result = $translator->translateWithFallback($locale, $localisedString);
+        $result = $instance->translateWithFallback($locale, $localisedString);
 
         $this->assertSame($translation, $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::concatenate
      */
     public function testConcatenate(): void
     {
@@ -338,29 +295,25 @@ class TranslatorTest extends TestCase
         $parts = ['def', 'ghi'];
         $expectedResult = 'jklmno';
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['translateWithFallback'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->exactly(2))
-                   ->method('translateWithFallback')
-                   ->withConsecutive(
-                       [$this->identicalTo($locale), $this->identicalTo('def')],
-                       [$this->identicalTo($locale), $this->identicalTo('ghi')],
-                   )
-                   ->willReturnOnConsecutiveCalls(
-                       'jkl',
-                       'mno'
-                   );
+        $instance = $this->createInstance(['translateWithFallback']);
+        $instance->expects($this->exactly(2))
+                 ->method('translateWithFallback')
+                 ->withConsecutive(
+                     [$this->identicalTo($locale), $this->identicalTo('def')],
+                     [$this->identicalTo($locale), $this->identicalTo('ghi')],
+                 )
+                 ->willReturnOnConsecutiveCalls(
+                     'jkl',
+                     'mno'
+                 );
 
-        $result = $this->invokeMethod($translator, 'concatenate', $locale, $parts);
+        $result = $this->invokeMethod($instance, 'concatenate', $locale, $parts);
 
         $this->assertSame($expectedResult, $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::doTranslate
      */
     public function testDoTranslate(): void
     {
@@ -381,27 +334,23 @@ class TranslatorTest extends TestCase
                       ->with($this->identicalTo($locale), $this->identicalTo($section), $this->identicalTo($name))
                       ->willReturn($storageValue);
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['applyProcessors'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('applyProcessors')
-                   ->with(
-                       $this->identicalTo($locale),
-                       $this->identicalTo($storageValue),
-                       $this->identicalTo($parameters),
-                   )
-                   ->willReturn($processedValue);
+        $instance = $this->createInstance(['applyProcessors']);
+        $instance->expects($this->once())
+                 ->method('applyProcessors')
+                 ->with(
+                     $this->identicalTo($locale),
+                     $this->identicalTo($storageValue),
+                     $this->identicalTo($parameters),
+                 )
+                 ->willReturn($processedValue);
 
-        $result = $this->invokeMethod($translator, 'doTranslate', $locale, $key, $parameters);
+        $result = $this->invokeMethod($instance, 'doTranslate', $locale, $key, $parameters);
 
         $this->assertSame($processedValue, $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::doTranslate
      */
     public function testDoTranslateWithMissingSection(): void
     {
@@ -422,27 +371,23 @@ class TranslatorTest extends TestCase
                       ->with($this->identicalTo($locale), $this->identicalTo($section), $this->identicalTo($name))
                       ->willReturn($storageValue);
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['applyProcessors'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->once())
-                   ->method('applyProcessors')
-                   ->with(
-                       $this->identicalTo($locale),
-                       $this->identicalTo($storageValue),
-                       $this->identicalTo($parameters),
-                   )
-                   ->willReturn($processedValue);
+        $instance = $this->createInstance(['applyProcessors']);
+        $instance->expects($this->once())
+                 ->method('applyProcessors')
+                 ->with(
+                     $this->identicalTo($locale),
+                     $this->identicalTo($storageValue),
+                     $this->identicalTo($parameters),
+                 )
+                 ->willReturn($processedValue);
 
-        $result = $this->invokeMethod($translator, 'doTranslate', $locale, $key, $parameters);
+        $result = $this->invokeMethod($instance, 'doTranslate', $locale, $key, $parameters);
 
         $this->assertSame($processedValue, $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::doTranslate
      */
     public function testDoTranslateWithUnknownKey(): void
     {
@@ -459,21 +404,17 @@ class TranslatorTest extends TestCase
         $this->storage->expects($this->never())
                       ->method('get');
 
-        $translator = $this->getMockBuilder(Translator::class)
-                           ->onlyMethods(['applyProcessors'])
-                           ->setConstructorArgs([$this->storage])
-                           ->getMock();
-        $translator->expects($this->never())
-                   ->method('applyProcessors');
+        $instance = $this->createInstance(['applyProcessors']);
+        $instance->expects($this->never())
+                 ->method('applyProcessors');
 
-        $result = $this->invokeMethod($translator, 'doTranslate', $locale, $key, $parameters);
+        $result = $this->invokeMethod($instance, 'doTranslate', $locale, $key, $parameters);
 
         $this->assertSame('', $result);
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::applyProcessors
      */
     public function testApplyProcessors(): void
     {
@@ -495,17 +436,14 @@ class TranslatorTest extends TestCase
                    ->with($this->identicalTo($locale), $this->identicalTo($string2), $this->identicalTo($parameters))
                    ->willReturn($string3);
 
-        $translator = new Translator($this->storage);
-        $this->injectProperty($translator, 'processors', [$processor1, $processor2]);
+        $instance = $this->createInstance();
+        $this->injectProperty($instance, 'processors', [$processor1, $processor2]);
 
-        $result = $translator->applyProcessors($locale, $string1, $parameters);
+        $result = $instance->applyProcessors($locale, $string1, $parameters);
 
         $this->assertSame($string3, $result);
     }
 
-    /**
-     * @covers ::getAllLocales
-     */
     public function testGetAllLocales(): void
     {
         $locales = ['abc', 'def'];
@@ -514,8 +452,8 @@ class TranslatorTest extends TestCase
                       ->method('getLocales')
                       ->willReturn($locales);
 
-        $translator = new Translator($this->storage);
-        $result = $translator->getAllLocales();
+        $instance = $this->createInstance();
+        $result = $instance->getAllLocales();
 
         $this->assertSame($locales, $result);
     }

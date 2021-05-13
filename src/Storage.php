@@ -33,7 +33,7 @@ class Storage
     }
 
     /**
-     * @return array<string>|string[]
+     * @return array<string>
      */
     public function getLocales(): array
     {

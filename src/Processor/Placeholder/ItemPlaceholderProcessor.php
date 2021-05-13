@@ -27,7 +27,7 @@ class ItemPlaceholderProcessor extends AbstractRegexProcessor implements Transla
 
     /**
      * @param string $locale
-     * @param array<string>|string[] $values
+     * @param array<string> $values
      * @param array<mixed> $parameters
      * @return string|null
      */

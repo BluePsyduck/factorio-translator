@@ -15,27 +15,26 @@ use ReflectionException;
  *
  * @author BluePsyduck <bluepsyduck@gmx.com>
  * @license http://opensource.org/licenses/GPL-3.0 GPL v3
- * @coversDefaultClass \BluePsyduck\FactorioTranslator\Processor\Placeholder\AbstractControlPlaceholderProcessor
+ * @covers \BluePsyduck\FactorioTranslator\Processor\Placeholder\AbstractControlPlaceholderProcessor
  */
 class AbstractControlPlaceholderProcessorTest extends TestCase
 {
     use ReflectionTrait;
 
     /**
-     * @throws ReflectionException
-     * @covers ::__construct
+     * @param array<string> $mockedMethods
+     * @return AbstractControlPlaceholderProcessor&MockObject
      */
-    public function testConstruct(): void
+    private function createInstance(array $mockedMethods = []): AbstractControlPlaceholderProcessor
     {
-        $processor = $this->getMockBuilder(AbstractControlPlaceholderProcessor::class)
-                          ->getMockForAbstractClass();
-
-        $this->assertGreaterThan(0, strlen($this->extractProperty($processor, 'pattern')));
+        return $this->getMockBuilder(AbstractControlPlaceholderProcessor::class)
+                    ->disableProxyingToOriginalMethods()
+                    ->onlyMethods($mockedMethods)
+                    ->getMockForAbstractClass();
     }
 
     /**
      * @throws ReflectionException
-     * @covers ::processMatch
      */
     public function testProcessMatch(): void
     {
@@ -44,16 +43,13 @@ class AbstractControlPlaceholderProcessorTest extends TestCase
         $parameters = ['ghi'];
         $processedValue = 'jkl';
 
-        /* @var AbstractControlPlaceholderProcessor&MockObject $processor */
-        $processor = $this->getMockBuilder(AbstractControlPlaceholderProcessor::class)
-                          ->onlyMethods(['processControl'])
-                          ->getMockForAbstractClass();
-        $processor->expects($this->once())
-                  ->method('processControl')
-                  ->with($this->identicalTo($locale), $this->identicalTo('def'), $this->identicalTo(42))
-                  ->willReturn($processedValue);
+        $instance = $this->createInstance(['processControl']);
+        $instance->expects($this->once())
+                 ->method('processControl')
+                 ->with($this->identicalTo($locale), $this->identicalTo('def'), $this->identicalTo(42))
+                 ->willReturn($processedValue);
 
-        $result = $this->invokeMethod($processor, 'processMatch', $locale, $values, $parameters);
+        $result = $this->invokeMethod($instance, 'processMatch', $locale, $values, $parameters);
 
         $this->assertSame($processedValue, $result);
     }
